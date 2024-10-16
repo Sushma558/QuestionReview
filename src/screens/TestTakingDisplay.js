@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import {CommonActions, useRoute} from '@react-navigation/native';
 import Question from '../components/Question';
+import firestore from '@react-native-firebase/firestore';
 
 function TestTakingDisplay({navigation}) {
   const [selected, setSelected] = useState();
@@ -26,17 +27,65 @@ function TestTakingDisplay({navigation}) {
   const route = useRoute();
   const [questionsnumber, setquestionsnumber] = useState(0);
   const [questions, setQuestions] = useState([]);
-  
+  const [lastDoc, setLastDoc] = useState();
+  const [questiondata, setquestiondata] = useState([]);
+
+  useEffect(() => {
+    console.log('review', route?.params?.selected)
+    let query = firestore()
+      .collection('NEETReviewQNS')
+      .where('reviewCode', '==', route?.params?.selected?.reviewCode)
+      .orderBy('addedOn', 'asc')
+      .limit(10);
+    if (lastDoc) {
+      query = query.startAfter(lastDoc);
+    }
+
+    query.onSnapshot(snapshot => {
+      const documents = snapshot.docs.map(doc => ({
+        id: doc.id, // Add the document ID
+        ...doc.data(), // Spread the document data
+      }));
+      console.log('data', documents)
+      setquestiondata([...documents]);
+      setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+
+      // setLoading(false);
+    });
+  }, [route?.params?.selected?.reviewCode]);
+  const paginate = () =>{
+    let query = firestore()
+      .collection('NEETReviewQNS')
+      .where('reviewCode', '==', route?.params?.selected?.reviewCode)
+      .orderBy('addedOn', 'asc')
+      .limit(10);
+    if (lastDoc) {
+      query = query.startAfter(lastDoc);
+    }
+
+    query.onSnapshot(snapshot => {
+      const documents = snapshot.docs.map(doc => ({
+        id: doc.id, // Add the document ID
+        ...doc.data(), // Spread the document data
+      }));
+      setquestiondata([...questiondata, ...documents]);
+      setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+
+      // setLoading(false);
+    });
+  }
   return (
     <SafeAreaView>
       <FlatList
         style={{marginTop: 16}}
         showsVerticalScrollIndicator={false}
         keyExtractor={item => item.question_id}
-        data={questions}
+        data={questiondata}
         renderItem={({item, index}) => {
           return <Question item={item} index={index} />;
         }}
+        onEndReachedThreshold={0.7}
+        onEndReached={paginate}
       />
     </SafeAreaView>
   );

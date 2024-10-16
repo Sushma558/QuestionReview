@@ -1,0 +1,250 @@
+{
+  "project_info": {
+    "project_number": "269755638441",
+    "firebase_url": "https://sconti-e7f3a-default-rtdb.firebaseio.com",
+    "project_id": "sconti-e7f3a",
+    "storage_bucket": "sconti-e7f3a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:269755638441:android:6e46d08e93a0ea2ad5ffb8",
+        "android_client_info": {
+          "package_name": "com.nammamartadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "269755638441-vns36m07efgaq30f5iuv3oaf4cmq7l6h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa3zif99kE5V0qgP_dYoLpwWOfwv12XbQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "269755638441-vns36m07efgaq30f5iuv3oaf4cmq7l6h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:269755638441:android:d511a564ef2f9793d5ffb8",
+        "android_client_info": {
+          "package_name": "com.nammamartnew"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "269755638441-vns36m07efgaq30f5iuv3oaf4cmq7l6h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa3zif99kE5V0qgP_dYoLpwWOfwv12XbQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "269755638441-vns36m07efgaq30f5iuv3oaf4cmq7l6h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:269755638441:android:13206c37798ed717d5ffb8",
+        "android_client_info": {
+          "package_name": "com.questionreview"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "269755638441-vns36m07efgaq30f5iuv3oaf4cmq7l6h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa3zif99kE5V0qgP_dYoLpwWOfwv12XbQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "269755638441-vns36m07efgaq30f5iuv3oaf4cmq7l6h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:269755638441:android:bbb2fcfe4298f459d5ffb8",
+        "android_client_info": {
+          "package_name": "com.quizadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "269755638441-hnv4gslnm7qscmeoik2hp2buka0tfeg7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quizadmin",
+            "certificate_hash": "c6cbb9d6ccec145f57147bcb1d3aeb36b95a2d18"
+          }
+        },
+        {
+          "client_id": "269755638441-vns36m07efgaq30f5iuv3oaf4cmq7l6h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa3zif99kE5V0qgP_dYoLpwWOfwv12XbQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "269755638441-vns36m07efgaq30f5iuv3oaf4cmq7l6h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:269755638441:android:ec345e0a27eed3fbd5ffb8",
+        "android_client_info": {
+          "package_name": "com.sconti17"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "269755638441-jnblo5jkfs8hfb6p7mj9nm8a21cr9bkg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sconti17",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "269755638441-mbv93r3jr0g6da7bhuh5ef38vamjfjfb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sconti17",
+            "certificate_hash": "c6cbb9d6ccec145f57147bcb1d3aeb36b95a2d18"
+          }
+        },
+        {
+          "client_id": "269755638441-vns36m07efgaq30f5iuv3oaf4cmq7l6h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa3zif99kE5V0qgP_dYoLpwWOfwv12XbQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "269755638441-vns36m07efgaq30f5iuv3oaf4cmq7l6h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:269755638441:android:7a50d3149dd09626d5ffb8",
+        "android_client_info": {
+          "package_name": "com.scontinent.sconti"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "269755638441-15sem66u0182r2m3ddn11018bn3maf15.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.scontinent.sconti",
+            "certificate_hash": "c6cbb9d6ccec145f57147bcb1d3aeb36b95a2d18"
+          }
+        },
+        {
+          "client_id": "269755638441-ljgn5f5ib9f6bp668sokfmgu6o3o5d7o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.scontinent.sconti",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "269755638441-q04ielpku0f00mgc9qm9dn6j7qu128e7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.scontinent.sconti",
+            "certificate_hash": "0534755be3f51ef1702656e237a40772451be2b3"
+          }
+        },
+        {
+          "client_id": "269755638441-tkbrb2mcmhl3q7276an2nfmppdr3n03d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.scontinent.sconti",
+            "certificate_hash": "01e1ac1e7802eb1ff814a684badd41df3f70d308"
+          }
+        },
+        {
+          "client_id": "269755638441-u2ud6kde5fnefokodqrj6hqcf21ocd4r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.scontinent.sconti",
+            "certificate_hash": "614cb2b9afd67ab7d5c52524e29c4362f8f13863"
+          }
+        },
+        {
+          "client_id": "269755638441-vns36m07efgaq30f5iuv3oaf4cmq7l6h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa3zif99kE5V0qgP_dYoLpwWOfwv12XbQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "269755638441-vns36m07efgaq30f5iuv3oaf4cmq7l6h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-4282613396193234~1558970896"
+    }
+  ],
+  "configuration_version": "1"
+}
