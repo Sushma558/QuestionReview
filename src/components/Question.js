@@ -4,6 +4,7 @@ import StatementFormatter from './StatementFormatter';
 import QuizComponents from './QuizComponents';
 import Image from 'react-native-scalable-image';
 import MathView, {MathText} from 'react-native-math-view';
+import EquationRendererText from './EquationRendereText';
 
 const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 
@@ -120,46 +121,7 @@ const Question = ({item, index, isRetake, isSimilar, isDaily, flatListRef}) => {
           qIndex={index}
           questiondata={item}
         />
-        {containsLatex(item?.explanation)
-          ? // Split LaTeX content by newlines and render each line separately
-            (item?.explanation)
-              .split('\\n')
-              .map((line, index) => (
-                <MathText
-                  key={index}
-                  value={line.trim()}
-                  direction="ltr"
-                  CellRendererComponent={
-                    <Text
-                      style={[
-                        {
-                          color: '#101828',
-                          lineHeight: 20,
-                          marginTop: 4,
-                          fontSize: 12,
-                          fontWeight: '200',
-                        },
-                      ]}
-                    />
-                  }
-                />
-              ))
-          : // Split non-LaTeX content by newlines and render each line separately
-            (item?.explanation).split('\\n').map((line, index) => (
-              <Text
-                key={index}
-                style={[
-                  {
-                    color: '#101828',
-                    lineHeight: 17,
-                    marginTop: 4,
-                    fontSize: 12,
-                    fontWeight: '200',
-                  },
-                ]}>
-                {line.trim()}
-              </Text>
-            ))}
+        <EquationRendererText content={item?.explanation}/>
 
         {/* <View style={{height: 1, width: '95%', color: 'grey'}} /> */}
       </View>
