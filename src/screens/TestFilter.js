@@ -150,13 +150,27 @@ function TestScreen() {
         </View>
       </View>
       <View style={{width:WIDTH*0.9, alignSelf:'center'}}>
-      <Button
-        title="Review Questions"
-        onPress={() => {
+   
+         
+        <TouchableOpacity
+          style={{
+            width: '98%',
+            height: 50,
+            backgroundColor: '#00a3f9',
+            elevation: 1,
+            borderRadius: 16,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={() => {
             console.log('selected', selectedYear);
           navigation.navigate('TestTaking', {selected: selectedYear});
-        }}
-      />
+        }}>
+          <Text style={{fontSize: 18, color: 'white', fontWeight: '400'}}>
+          Review Questions
+          </Text>
+        </TouchableOpacity>
+ 
       </View>
       {/* <View style={styles.dropdownContainer1}>
         <Text style={styles.filterLabel}>Subject:</Text>

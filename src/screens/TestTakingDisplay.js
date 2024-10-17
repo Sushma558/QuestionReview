@@ -1,13 +1,4 @@
-/* eslint-disable react/no-unstable-nested-components */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable quotes */
-
-/* eslint-disable react/jsx-filename-extension */
-/* eslint-disable react/prop-types */
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -15,79 +6,113 @@ import {
   Text,
   ToastAndroid,
   View,
+  TouchableOpacity,
+  StyleSheet,
 } from 'react-native';
-import {CommonActions, useRoute} from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import Question from '../components/Question';
 import firestore from '@react-native-firebase/firestore';
 
 function TestTakingDisplay({navigation}) {
   const [selected, setSelected] = useState();
-
   const [errorText, setErrorText] = useState();
   const route = useRoute();
   const [questionsnumber, setquestionsnumber] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [lastDoc, setLastDoc] = useState();
   const [questiondata, setquestiondata] = useState([]);
+  const [pushedQuestions, setPushedQuestions] = useState([]); // Track pushed questions
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('review', route?.params?.selected)
-    let query = firestore()
-      .collection('NEETReviewQNS')
-      .where('reviewCode', '==', route?.params?.selected?.reviewCode)
-      .orderBy('addedOn', 'asc')
-      .limit(10);
-    if (lastDoc) {
-      query = query.startAfter(lastDoc);
-    }
-
-    query.onSnapshot(snapshot => {
-      const documents = snapshot.docs.map(doc => ({
-        id: doc.id, // Add the document ID
-        ...doc.data(), // Spread the document data
-      }));
-      console.log('data', documents)
-      setquestiondata([...documents]);
-      setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-
-      // setLoading(false);
-    });
+    console.log('review', route?.params?.selected);
+    fetchQuestions();
   }, [route?.params?.selected?.reviewCode]);
-  const paginate = () =>{
+
+  const fetchQuestions = () => {
     let query = firestore()
       .collection('NEETReviewQNS')
       .where('reviewCode', '==', route?.params?.selected?.reviewCode)
       .orderBy('addedOn', 'asc')
       .limit(10);
+
     if (lastDoc) {
       query = query.startAfter(lastDoc);
     }
 
     query.onSnapshot(snapshot => {
       const documents = snapshot.docs.map(doc => ({
-        id: doc.id, // Add the document ID
-        ...doc.data(), // Spread the document data
+        id: doc.id,
+        ...doc.data(),
       }));
-      setquestiondata([...questiondata, ...documents]);
+      console.log('data', documents);
+      setquestiondata(prevData => [...prevData, ...documents]);
       setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-
-      // setLoading(false);
+      setLoading(false);
     });
-  }
+  };
+
+  const renderItem = ({item, index}) => {
+    return (
+      <View style={styles.itemContainer}>
+        <Question item={item} index={index} />
+      </View>
+    );
+  };
+
   return (
-    <SafeAreaView>
-      <FlatList
-        style={{marginTop: 16}}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={item => item.question_id}
-        data={questiondata}
-        renderItem={({item, index}) => {
-          return <Question item={item} index={index} />;
-        }}
-        onEndReachedThreshold={0.7}
-        onEndReached={paginate}
-      />
+    <SafeAreaView style={styles.container}>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) : (
+        <FlatList
+          style={styles.list}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={item => item.id}
+          data={questiondata}
+          renderItem={renderItem}
+          onEndReachedThreshold={0.7}
+          onEndReached={fetchQuestions}
+        />
+      )}
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  list: {
+    marginTop: 16,
+    width: '95%',
+    left: 10,
+  },
+  itemContainer: {
+    marginBottom: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  //   pushButton: {
+  //     width: '90%',
+  //     height: 50,
+  //     backgroundColor: '#00a3f9',
+  //     elevation: 1,
+  //     borderRadius: 16,
+  //     justifyContent: 'center',
+  //     alignItems: 'center',
+  //   },
+  //   pushButtonText: {
+  //  fontSize: 18, color: 'white', fontWeight: '400'
+  //   },
+  //   disabledButton: {
+  //     backgroundColor: 'gray', // Change color when disabled
+  //   },
+});
+
 export default TestTakingDisplay;
