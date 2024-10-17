@@ -1,11 +1,8 @@
-import {useTheme} from '@/theme';
 import React from 'react';
 import {Text, View} from 'react-native';
 import MathView, {MathText} from 'react-native-math-view';
 
-function EquationRenderOption({content, style}) {
-  const {colors, fonts} = useTheme();
-
+function EquationRenderOption({content}) {
   const containsLatex = text => {
     const latexPattern =
       /(\$\$[\s\S]*?\$\$|\$.*?\$|\\\[|\\\(|\\\)|\\[a-zA-Z]+)/;
@@ -42,14 +39,12 @@ function EquationRenderOption({content, style}) {
             direction="ltr"
             CellRendererComponent={
               <Text
-                style={[
-                  {
-                    color: '#101828',
-                    lineHeight: 20,
-                    fontSize: 14,
-                    fontWeight: '500',
-                  },
-                ]}
+                style={{
+                  color: '#101828',
+                  lineHeight: 20,
+                  fontSize: 14,
+                  fontWeight: '500',
+                }}
               />
             }
           />
@@ -59,9 +54,12 @@ function EquationRenderOption({content, style}) {
       return (
         <Text
           key={index}
-          style={[
-            {color: '#101828', lineHeight: 20, fontSize: 14, fontWeight: '500'},
-          ]}>
+          style={{
+            color: '#101828',
+            lineHeight: 20,
+            fontSize: 14,
+            fontWeight: '500',
+          }}>
           {part}
         </Text>
       );

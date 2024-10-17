@@ -1,18 +1,15 @@
-import { useTheme } from "@/theme";
-import React from "react";
-import { Text, View } from "react-native";
-import MathView, { MathText } from "react-native-math-view";
+import React from 'react';
+import {Text, View} from 'react-native';
+import MathView, {MathText} from 'react-native-math-view';
 
-function EquationRendererText({ content }) {
-  const { colors, fonts } = useTheme();
-
-  const containsLatex = (text) => {
+function EquationRendererText({content}) {
+  const containsLatex = text => {
     const latexPattern =
       /(\$\$[\s\S]*?\$\$|\$.*?\$|\\\[|\\\(|\\\)|\\[a-zA-Z]+)/;
     return latexPattern.test(text);
   };
 
-  const isBlockLatex = (text) => {
+  const isBlockLatex = text => {
     const blockLatexPattern = /(\$\$[\s\S]*?\$\$|\\\[.*?\\\])/;
     return blockLatexPattern.test(text);
   };
@@ -26,12 +23,12 @@ function EquationRendererText({ content }) {
             math={part}
             resizeMode="contain"
             style={{
-              backgroundColor: "transparent",
+              backgroundColor: 'transparent',
               borderRadius: 8,
-              alignSelf: "flex-start",
+              alignSelf: 'flex-start',
               marginBottom: 5, // Add space between blocks
             }}
-            config={{ ex: 10, inline: false, em: 14 }}
+            config={{ex: 10, inline: false, em: 14}}
           />
         );
       } else {
@@ -42,10 +39,12 @@ function EquationRendererText({ content }) {
             direction="ltr"
             CellRendererComponent={
               <Text
-                style={[
-                 
-                  { color: "#101828", lineHeight: 24, fontSize:14, fontWeight:'200' },
-                ]}
+                style={{
+                  color: 'black',
+                  lineHeight: 24,
+                  fontSize: 14,
+                  // fontWeight: '300',
+                }}
               />
             }
           />
@@ -55,11 +54,12 @@ function EquationRendererText({ content }) {
       return (
         <Text
           key={index}
-          style={[
-            { color: "#101828", lineHeight: 24, fontSize:14, fontWeight:'200' },
-
-          ]}
-        >
+          style={{
+            color: 'black',
+            lineHeight: 24,
+            fontSize: 14,
+            // fontWeight: '300',
+          }}>
           {part}
         </Text>
       );
@@ -67,12 +67,12 @@ function EquationRendererText({ content }) {
   };
 
   // Split content by newline (\n) and render each part
-  const contentParts = content.split("\\n");
+  const contentParts = content.split('\\n');
 
   return (
-    <View style={{ flexDirection: "column", alignSelf: "stretch" }}>
+    <View style={{flexDirection: 'column', alignSelf: 'stretch'}}>
       {contentParts.map((part, index) => (
-        <View key={index} style={{ flexDirection: "row", flexWrap: "wrap" }}>
+        <View key={index} style={{flexDirection: 'row', flexWrap: 'wrap'}}>
           {renderContent(part, index)}
         </View>
       ))}
