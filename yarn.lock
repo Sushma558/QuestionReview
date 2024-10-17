@@ -2660,13 +2660,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-async-storage/root@github:react-native-async-storage/async-storage":
-  version: 0.0.1-dev
-  resolution: "@react-native-async-storage/root@git+ssh://git@github.com/react-native-async-storage/async-storage.git#commit=db99ba9015e02a43822db345dc5fca777d5a20a0"
-  checksum: 0a77eea2d46250364a43942afa04ad6f3eb037168cba3bc5321c76ff74a301fda1b1fc3e9cc38cb47c6053947b8cb9aab1b7279f5b7a02408dafb651a202fc8f
-  languageName: node
-  linkType: hard
-
 "@react-native-community/cli-clean@npm:14.1.0":
   version: 14.1.0
   resolution: "@react-native-community/cli-clean@npm:14.1.0"
@@ -3628,7 +3621,6 @@ __metadata:
     "@babel/core": ^7.20.0
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
-    "@react-native-async-storage/root": "github:react-native-async-storage/async-storage"
     "@react-native-firebase/app": ^21.0.0
     "@react-native-firebase/auth": ^21.0.0
     "@react-native-firebase/firestore": ^21.0.0

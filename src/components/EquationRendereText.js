@@ -1,10 +1,10 @@
-import { useTheme } from "@/theme";
+// import { useTheme } from "@/theme"
 import React from "react";
 import { Text, View } from "react-native";
 import MathView, { MathText } from "react-native-math-view";
 
 function EquationRendererText({ content }) {
-  const { colors, fonts } = useTheme();
+  // const { colors, fonts } = useTheme();
 
   const containsLatex = (text) => {
     const latexPattern =
