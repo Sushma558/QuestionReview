@@ -20,7 +20,7 @@ const TEST_PASSWORD = 'password123';
 const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -39,6 +39,7 @@ const LoginScreen = ({navigation}) => {
         console.log('Logged in with test credentials');
         navigation.navigate('Home');
       } else {
+        setLoading(true);
         const userCredential = await auth().signInWithEmailAndPassword(
           email,
           password,
@@ -51,6 +52,7 @@ const LoginScreen = ({navigation}) => {
     } catch (error) {
       console.error('Login error:', error);
       Alert.alert('Error', error.message);
+      setLoading(false);
     }
   };
 
@@ -131,15 +133,15 @@ const LoginScreen = ({navigation}) => {
             alignItems: 'center',
           }}
           onPress={handleLogin}>
-          {loading ? (
-            <Text style={{fontSize: 18, color: 'white', fontWeight: '400'}}>
-            Login
-          </Text>
-            
-          ) : (
+          {loading ?  (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#0000ff" />
             </View>
+          ) : (
+            <Text style={{fontSize: 18, color: 'white', fontWeight: '400'}}>
+            Login
+          </Text>
+
           )}
         </TouchableOpacity>
       </View>

@@ -28,8 +28,10 @@ function TestScreen() {
   const [selectedSubject, setSelectedSubject] = useState('All');
   const [allSections, setAllSections] = useState([]);
   const [filteredSections, setFilteredSections] = useState([]);
-  const navigation = useNavigation();
+  const [reviewersapprove, setReviewersapprove] = useState([]);
+  const [reviewersreject, setReviewersreject] = useState([]);
 
+  const navigation = useNavigation();
 
   const route = useRoute();
 
@@ -63,18 +65,29 @@ function TestScreen() {
         setAllSections(sections);
         setLoading(false);
       });
+
+    firestore()
+      .collection('SamaiReviewUsers')
+      .where('userType', '==', 'Reviewer')
+      .get()
+      .then(snap => {
+        const reviewersWithApprove = snap.docs.map(
+          doc => `${doc.data()?.userId}-approve`,
+        );
+        setReviewersapprove(reviewersWithApprove);
+      });
   }, []);
 
   useEffect(() => {
     if (allSections && selectedClass) {
       if (selectedClass == 'ai') {
         const nonPyqItems = allSections.filter(
-          item => !item.reviewCode?.toLowerCase().includes('pyq'),
+          item => item.from?.toLowerCase() === 'ai',
         );
         setFilteredSections(nonPyqItems);
       } else {
-        const filtered = allSections.filter(item =>
-          item.reviewCode?.toLowerCase().includes('pyq'),
+        const filtered = allSections.filter(
+          item => item.from?.toLowerCase() === 'pyq',
         );
         setFilteredSections(filtered);
       }
@@ -82,7 +95,7 @@ function TestScreen() {
   }, [selectedClass, allSections]);
 
   const handleYearChange = year => {
-    console.log(year)
+    console.log(year);
     setSelectedYear(year);
     filterQuestions(year, selectedClass);
   };
@@ -149,9 +162,7 @@ function TestScreen() {
           </Picker>
         </View>
       </View>
-      <View style={{width:WIDTH*0.9, alignSelf:'center'}}>
-   
-         
+      <View style={{width: WIDTH * 0.9, alignSelf: 'center'}}>
         <TouchableOpacity
           style={{
             width: '98%',
@@ -164,13 +175,16 @@ function TestScreen() {
           }}
           onPress={() => {
             console.log('selected', selectedYear);
-          navigation.navigate('TestTaking', {selected: selectedYear});
-        }}>
+            if(reviewersapprove && reviewersapprove?.length>0){
+            navigation.navigate('TestTaking', {selected: selectedYear, reviewersapprove: reviewersapprove});
+            }else{
+              ToastAndroid.show('Please wait...', ToastAndroid.SHORT);
+            }
+          }}>
           <Text style={{fontSize: 18, color: 'white', fontWeight: '400'}}>
-          Review Questions
+            Review Questions
           </Text>
         </TouchableOpacity>
- 
       </View>
       {/* <View style={styles.dropdownContainer1}>
         <Text style={styles.filterLabel}>Subject:</Text>

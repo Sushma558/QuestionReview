@@ -7,11 +7,15 @@ import {
   TouchableOpacity,
   ToastAndroid,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import StatementFormatter from './StatementFormatter';
 import QuizComponents from './QuizComponents';
 import Image from 'react-native-scalable-image';
 import EquationRendererText from './EquationRendereText';
+import axios from 'axios';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const {width: screenWidth} = Dimensions.get('window');
 const figmaDesignWidth = 375;
@@ -19,20 +23,28 @@ const scale = screenWidth / figmaDesignWidth;
 const WIDTH = Dimensions.get('screen').width;
 const HEIGHT = Dimensions.get('screen').height;
 
-const Question = ({item, index, isRetake, isSimilar, isDaily, flatListRef}) => {
+const Question = ({
+  item,
+  index,
+  isRetake,
+  isSimilar,
+  isDaily,
+  flatListRef,
+  reviewData,
+}) => {
   const containsLatex = text => {
     const latexPattern = /(\$.*?\$|\\\(|\\\)|\\[a-zA-Z]+)/;
     return latexPattern.test(text);
   };
   const [pushedQuestions, setPushedQuestions] = useState([]); // Track pushed questions
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const isPushed = pushedQuestions.includes(item.id); // Check if the question is already pushed
 
   const handlePush = item => {
     // Add the pushed question to the state
     setPushedQuestions(prevState => [...prevState, item.id]);
-    ToastAndroid.show('Question pushed!', ToastAndroid.SHORT);
+    handleSingleQUestionPush();
   };
   const handleSingleQUestionPush = () => {
     const data = {
@@ -44,35 +56,38 @@ const Question = ({item, index, isRetake, isSimilar, isDaily, flatListRef}) => {
           option_b: item?.options[1]?.text,
           option_c: item?.options[2]?.text,
           option_d: item?.options[3]?.text,
-          question_categories: '',
+          question_categories: item?.solvingtips,
           question_text: item?.question,
           short_explanation: item?.explanation,
-          question_type: 'generated',
+          question_type: reviewData?.from === 'pyq' ? 'pyq' : 'generated',
           exam_id: '2df8f075-e95a-4126-a80d-7a68b7e4c31e',
-          subject_id: item?.subject?.subject_id,
+          subject_id: item?.subjectData?.subject_id,
           topic_id: item?.unit?.unit_id,
           sub_topic_id: item?.sub_topic?.sub_topic_id,
           difficulty_level: 'advanced',
-          user_id: props.userdata.userId,
+          user_id: auth()?.currentUser?.uid,
           image_url: item?.image_url,
           option_a_image_url: item?.options[0]?.image,
           option_b_image_url: item?.options[1]?.image,
           option_c_image_url: item?.options[2]?.image,
           option_d_image_url: item?.options[3]?.image,
+          year:
+            reviewData?.from === 'pyq'
+              ? item?.year && item?.year != ''
+                ? Number.parseInt(item?.year)
+                : 2024
+              : 2024,
           //  need to add pyq and need to mention the year body parameter
           // need to change the userid
         },
       ],
     };
     if (
-      item?.subject?.subject_id ||
-      item?.unit?.unit_id ||
-      item?.sub_topic?.sub_topic_id === undefined
+      item?.subjectData?.subject_id &&
+      item?.unit?.unit_id &&
+      item?.sub_topic?.sub_topic_id
     ) {
-      alert(
-        'Subject name,Chapter name and Topic name should be there to push to database',
-      );
-    } else {
+      setLoading(true);
       axios
         .post(
           'https://mep.scontiapp.com/samai/v1/api/v1/question/add_questions',
@@ -80,16 +95,25 @@ const Question = ({item, index, isRetake, isSimilar, isDaily, flatListRef}) => {
         )
         .then(response => {
           console.log('Single question pushed', response.data);
+          pushSingleQuestion(response.data?.question_ids[0]);
           setLoading(false);
+          ToastAndroid.show('Question pushed!', ToastAndroid.SHORT);
         })
         .catch(error => console.error('Error:', error));
+    } else {
+      Alert.alert(
+        'Subject name,Chapter name and Topic name should be there to push to database',
+      );
+      setLoading(false);
     }
   };
 
-  const fetchSingleQuestionFromFirebase = () => {
-    db.collection('NEETReviewQNS').update({
+  const pushSingleQuestion = (id) => {
+    firestore().collection('NEETReviewQNS').doc(item?.id).update({
       pushedOn: new Date(),
-      pushedBy: auth.currentUser.email,
+      pushedBy: auth()?.currentUser?.email,
+      isPushed: true,
+      dbaddedquestionid: id?id:"N/A"
     });
   };
 
@@ -97,7 +121,7 @@ const Question = ({item, index, isRetake, isSimilar, isDaily, flatListRef}) => {
     <View key={item?.question_id} style={styles.questionContainer}>
       {/* Subject, Chapter, and Topic View */}
       <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Subject: {item?.subject || 'N/A'}</Text>
+        <Text style={styles.headerText}>Subject: {item?.subjectData?.subject_name || 'N/A'}</Text>
         <Text style={styles.headerText}>
           Chapter: {item?.unit?.unit_name || 'N/A'}
         </Text>
@@ -169,6 +193,10 @@ const Question = ({item, index, isRetake, isSimilar, isDaily, flatListRef}) => {
             alignItems: 'center',
           }}>
           {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+          ):(
             <TouchableOpacity
               style={[styles.pushButton, isPushed && styles.disabledButton]}
               onPress={() => handlePush(item)}
@@ -182,11 +210,7 @@ const Question = ({item, index, isRetake, isSimilar, isDaily, flatListRef}) => {
                 {isPushed ? 'Pushed' : 'Push'}
               </Text>
             </TouchableOpacity>
-          ) : (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-          )}
+          ) }
         </View>
       </View>
     </View>

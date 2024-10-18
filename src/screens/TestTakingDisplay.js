@@ -26,13 +26,16 @@ function TestTakingDisplay({navigation}) {
 
   useEffect(() => {
     console.log('review', route?.params?.selected);
-    fetchQuestions();
-  }, [route?.params?.selected?.reviewCode]);
+    fetchQuestions(route?.params?.reviewersapprove);
+  }, [route?.params]);
 
-  const fetchQuestions = () => {
+  const fetchQuestions = (reviewers) => {
+    console.log(reviewers)
     let query = firestore()
       .collection('NEETReviewQNS')
       .where('reviewCode', '==', route?.params?.selected?.reviewCode)
+      .where('reviewStatus','array-contains-any', reviewers)
+      .where('isPushed','==',false)
       .orderBy('addedOn', 'asc')
       .limit(10);
 
@@ -40,7 +43,7 @@ function TestTakingDisplay({navigation}) {
       query = query.startAfter(lastDoc);
     }
 
-    query.onSnapshot(snapshot => {
+    query.get().then(snapshot => {
       const documents = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
@@ -49,13 +52,15 @@ function TestTakingDisplay({navigation}) {
       setquestiondata(prevData => [...prevData, ...documents]);
       setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
       setLoading(false);
+    }).catch(err=>{
+      console.log(err);
     });
   };
 
   const renderItem = ({item, index}) => {
     return (
       <View style={styles.itemContainer}>
-        <Question item={item} index={index} />
+        <Question item={item} index={index} reviewData={route?.params?.selected}/>
       </View>
     );
   };
@@ -74,7 +79,16 @@ function TestTakingDisplay({navigation}) {
           data={questiondata}
           renderItem={renderItem}
           onEndReachedThreshold={0.7}
-          onEndReached={fetchQuestions}
+          onEndReached={()=>{
+            fetchQuestions(route?.params?.reviewersapprove);
+          }}
+          ListEmptyComponent={()=>{
+            return(
+              <View style={{flex:1, justifyContent:'center'}}>
+              <Text style={{fontSize:16, fontWeight:'600', color:'#000'}}>No Reviewed Questions...</Text>
+              </View>
+            )
+          }}
         />
       )}
     </SafeAreaView>
