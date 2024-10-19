@@ -64,7 +64,7 @@ const Question = ({
           subject_id: item?.subjectData?.subject_id,
           topic_id: item?.unit?.unit_id,
           sub_topic_id: item?.sub_topic?.sub_topic_id,
-          difficulty_level: 'advanced',
+          difficulty_level: item?.difficultyLevel?item?.difficultyLevel:"1",
           user_id: auth()?.currentUser?.uid,
           image_url: item?.image_url,
           option_a_image_url: item?.options[0]?.image,
