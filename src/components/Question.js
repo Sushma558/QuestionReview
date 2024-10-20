@@ -40,6 +40,7 @@ const Question = ({
   const [loading, setLoading] = useState(false);
 
   const isPushed = pushedQuestions.includes(item.id); // Check if the question is already pushed
+  console.table([item])
 
   const handlePush = item => {
     // Add the pushed question to the state
@@ -184,6 +185,9 @@ const Question = ({
         />
         <Text style={styles.headerText}>
           Correct Answer: {item?.correctanswer || 'N/A'}
+        </Text>
+        <Text style={styles.headerText}>
+         Difficulty Level: {item?.difficultyLevel || 'N/A'}
         </Text>
         <EquationRendererText content={item?.explanation} />
         <View

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,8 +11,8 @@ import {
   Button,
   Dimensions,
 } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { Picker } from '@react-native-picker/picker';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Question from '../components/Question';
 import firestore from '@react-native-firebase/firestore';
 
@@ -60,7 +60,7 @@ function TestScreen() {
       .then(snapShot => {
         var sections = [];
         snapShot.docs.map(item => {
-          sections.push({...item.data(), id: item.id});
+          sections.push({ ...item.data(), id: item.id });
         });
         setAllSections(sections);
         setLoading(false);
@@ -73,6 +73,7 @@ function TestScreen() {
       .then(snap => {
         const reviewersWithApprove = snap.docs.map(
           doc => `${doc.data()?.userId}-approve`,
+        
         );
         setReviewersapprove(reviewersWithApprove);
       });
@@ -162,7 +163,7 @@ function TestScreen() {
           </Picker>
         </View>
       </View>
-      <View style={{width: WIDTH * 0.9, alignSelf: 'center'}}>
+      <View style={{ width: WIDTH * 0.9, alignSelf: 'center' }}>
         <TouchableOpacity
           style={{
             width: '98%',
@@ -175,14 +176,38 @@ function TestScreen() {
           }}
           onPress={() => {
             console.log('selected', selectedYear);
-            if(reviewersapprove && reviewersapprove?.length>0){
-            navigation.navigate('TestTaking', {selected: selectedYear, reviewersapprove: reviewersapprove});
-            }else{
+            if (reviewersapprove && reviewersapprove?.length > 0) {
+              navigation.navigate('TestTaking', { selected: selectedYear, reviewersapprove: reviewersapprove });
+            } else {
               ToastAndroid.show('Please wait...', ToastAndroid.SHORT);
             }
           }}>
-          <Text style={{fontSize: 18, color: 'white', fontWeight: '400'}}>
+          <Text style={{ fontSize: 18, color: 'white', fontWeight: '400' }}>
             Review Questions
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View style={{ width: WIDTH * 0.9, alignSelf: 'center',marginTop:15 }}>
+        <TouchableOpacity
+          style={{
+            width: '98%',
+            height: 50,
+            backgroundColor: '#00a3f9',
+            elevation: 1,
+            borderRadius: 16,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={() => {
+            console.log('selected', selectedYear);
+            if (reviewersapprove && reviewersapprove?.length > 0) {
+              navigation.navigate('seeall', { selected: selectedYear, reviewersapprove: reviewersapprove });
+            } else {
+              ToastAndroid.show('Please wait...', ToastAndroid.SHORT);
+            }
+          }}>
+          <Text style={{ fontSize: 18, color: 'white', fontWeight: '400' }}>
+           See All
           </Text>
         </TouchableOpacity>
       </View>
