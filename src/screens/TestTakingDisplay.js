@@ -112,21 +112,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  //   pushButton: {
-  //     width: '90%',
-  //     height: 50,
-  //     backgroundColor: '#00a3f9',
-  //     elevation: 1,
-  //     borderRadius: 16,
-  //     justifyContent: 'center',
-  //     alignItems: 'center',
-  //   },
-  //   pushButtonText: {
-  //  fontSize: 18, color: 'white', fontWeight: '400'
-  //   },
-  //   disabledButton: {
-  //     backgroundColor: 'gray', // Change color when disabled
-  //   },
+  
 });
 
 export default TestTakingDisplay;
