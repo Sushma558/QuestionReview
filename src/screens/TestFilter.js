@@ -19,6 +19,7 @@ import firestore from '@react-native-firebase/firestore';
 const WIDTH = Dimensions.get('screen').width;
 const HEIGHT = Dimensions.get('screen').height;
 
+
 function TestScreen() {
   const [questions, setQuestions] = useState([]);
   const [filteredQuestions, setFilteredQuestions] = useState([]);
@@ -30,6 +31,9 @@ function TestScreen() {
   const [filteredSections, setFilteredSections] = useState([]);
   const [reviewersapprove, setReviewersapprove] = useState([]);
   const [reviewersreject, setReviewersreject] = useState([]);
+  const [reviewersAdmin, setReviewersAdmin] = useState([]);
+
+
 
   const navigation = useNavigation();
 
@@ -75,6 +79,17 @@ function TestScreen() {
           doc => `${doc.data()?.userId}-approve`,
         );
         setReviewersapprove(reviewersWithApprove);
+      });
+
+    firestore()
+      .collection('SamaiReviewUsers')
+      .where('userType', '==', 'Admin')
+      .get()
+      .then(snap => {
+        const reviewersWithApprove = snap.docs.map(
+          doc => `${doc.data()?.userId}-approve`,
+        );
+        setReviewersAdmin(reviewersWithApprove);
       });
   }, []);
 
@@ -138,6 +153,9 @@ function TestScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <BottomSheetForFeedback bottomSheetVisible={bottomSheetVisible}
+        setBottomSheetVisible={setBottomSheetVisible}
+      />
       <View style={styles.filterContainer}>
         <View style={styles.dropdownContainer}>
           <Text style={styles.filterLabel}>Type:</Text>
@@ -156,9 +174,11 @@ function TestScreen() {
             selectedValue={selectedYear}
             style={styles.picker}
             onValueChange={itemValue => handleYearChange(itemValue)}>
-            {filteredSections.map((item, index) => {
-              return <Picker.Item label={item?.name} value={item} />;
-            })}
+            {filteredSections
+              .sort((a, b) => a.name.localeCompare(b.name)) // Sort in ascending order
+              .map((item, index) => (
+                <Picker.Item key={index} label={item?.name} value={item} />
+              ))}
           </Picker>
         </View>
       </View>
@@ -175,9 +195,12 @@ function TestScreen() {
           }}
           onPress={() => {
             console.log('selected', selectedYear);
-            if(reviewersapprove && reviewersapprove?.length>0){
-            navigation.navigate('TestTaking', {selected: selectedYear, reviewersapprove: reviewersapprove});
-            }else{
+            if (reviewersapprove && reviewersapprove?.length > 0) {
+              navigation.navigate('TestTaking', {
+                selected: selectedYear,
+                reviewersapprove: reviewersapprove,
+              });
+            } else {
               ToastAndroid.show('Please wait...', ToastAndroid.SHORT);
             }
           }}>
@@ -186,44 +209,65 @@ function TestScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-      {/* <View style={styles.dropdownContainer1}>
-        <Text style={styles.filterLabel}>Subject:</Text>
-        <Picker
-          selectedValue={selectedSubject}
-          style={styles.picker}
-          onValueChange={(itemValue) => handleSubjectChange(itemValue)}
-        >
-          <Picker.Item label="Subject " value=" " />
-          <Picker.Item label="Physics" value="Physics" />
-          <Picker.Item label="Chemistry" value="Chemistry" />
-          <Picker.Item label="Botonoy" value="Botonoy" />
-          <Picker.Item label="Zology" value="Zology" />
-          <Picker.Item label="Biology" value="Biology" />
-        </Picker>
-      </View> */}
-
-      {/* <FlatList
-        style={styles.flatList}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={item => item.question_id.toString()}
-        data={filteredQuestions}
-        renderItem={({item, index}) => (
-          <View>
-            <Question
-              item={item}
-              index={index}
-              isRetake={false}
-              isSimilar={false}
-              isDaily={false}
-            />
-            <TouchableOpacity
-              style={styles.pushButton}
-              onPress={() => handlePushButtonPress(item.question_id)}>
-              <Text style={styles.pushButtonText}>Push</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      /> */}
+      <View style={{width: WIDTH * 0.9, alignSelf: 'center', marginTop: 15}}>
+        <TouchableOpacity
+          style={{
+            width: '98%',
+            height: 50,
+            backgroundColor: '#00a3f9',
+            elevation: 1,
+            borderRadius: 16,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={() => {
+            console.log('selected', selectedYear);
+            if (reviewersapprove && reviewersapprove?.length > 0) {
+              navigation.navigate('seeall', {
+                selected: selectedYear,
+                reviewersapprove: reviewersapprove,
+              });
+            } else {
+              ToastAndroid.show('Please wait...', ToastAndroid.SHORT);
+            }
+          }}>
+          <Text style={{fontSize: 18, color: 'white', fontWeight: '400'}}>
+            See All
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View style={{width: WIDTH * 0.9, alignSelf: 'center', marginTop: 15}}>
+        <TouchableOpacity
+          style={{
+            width: '98%',
+            height: 50,
+            backgroundColor: 'orange',
+            elevation: 1,
+            borderRadius: 16,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={() => {
+            console.log('selected', selectedYear);
+            if (reviewersAdmin && reviewersAdmin?.length > 0) {
+              navigation.navigate('sconti', {
+                selected: selectedYear,
+                reviewersapprove: reviewersAdmin,
+              });
+              console.log('sconti', {
+                selected: selectedYear,
+                reviewersapprove: reviewersAdmin,
+              });
+            } else {
+              ToastAndroid.show('Please wait...', ToastAndroid.SHORT);
+            }
+          }}>
+          <Text style={{fontSize: 18, color: 'white', fontWeight: '400'}}>
+            Sconti team
+          </Text>
+        </TouchableOpacity>
+      </View>
+  
     </SafeAreaView>
   );
 }
@@ -296,6 +340,15 @@ const styles = StyleSheet.create({
   pushButtonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  btn: {
+    width: '98%',
+    height: 50,
+    backgroundColor: 'orange',
+    elevation: 1,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

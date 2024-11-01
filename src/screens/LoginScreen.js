@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   TextInput,
@@ -8,23 +8,46 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import VisibilityOn from '../assets/VisibilityOn';
 import VisibilityOff from '../assets/VisibilityOff';
-
+import SamAi from '../assets/SamAi.png';
+import firestore from '@react-native-firebase/firestore';
+import { useNavigation } from '@react-navigation/native';
 // Test credentials
 const TEST_EMAIL = 'test@example.com';
 const TEST_PASSWORD = 'password123';
 
-const LoginScreen = ({navigation}) => {
+const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState();
+  const navigation=useNavigation();
+
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
+  };
+
+  const getUserDetails = (userId) => {
+    firestore().collection("SamaiReviewUsers")
+      .doc(userId)
+      .get()
+      .then((res) => {
+        setUserData(res.data());
+        // getUserDetails(res.user.uid);
+        console.log(res.data());
+        navigation.navigate("Home", { userdata: res.data()} );
+        console.log("Home", { userdata: res.data() });
+
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const handleLogin = async () => {
@@ -45,9 +68,12 @@ const LoginScreen = ({navigation}) => {
           password,
         );
         console.log('User signed in successfully');
-        console.log('User data:', JSON.stringify(userCredential.user, null, 2));
+        console.log('User data:', typeof(userCredential.user),(userCredential.user));
+        console.log('User data2:', typeof(userCredential.user.uid),(userCredential.user.uid));
+        getUserDetails(userCredential.user.uid);
         setLoading(false);
-        navigation.navigate('Home');
+        
+        // navigation.navigate('Home',{userdata:JSON.stringify(userCredential.user,)});
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -55,95 +81,56 @@ const LoginScreen = ({navigation}) => {
       setLoading(false);
     }
   };
-
-  //   const handleAnonymousLogin = async () => {
-  //     try {
-  //       const userCredential = await auth().signInAnonymously();
-  //       console.log('User signed in anonymously');
-  //       console.log('Anonymous user data:', JSON.stringify(userCredential.user, null, 2));
-  //       navigation.navigate('TestScreen');
-  //     } catch (error) {
-  //       console.error('Anonymous login error:', error);
-  //       Alert.alert('Error', error.message);
-  //     }
-  //   };
-
   return (
     <View style={styles.container}>
-      <Text
-        style={{
-          fontSize: 20,
-          color: 'black',
-          fontWeight: '500',
-          textAlign: 'center',
-          marginVertical: 10,
-        }}>
-        Welcome to Question Push to Samai DB
-      </Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      {/* <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      /> */}
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          height: 50,
-          borderColor: 'gray',
-          borderWidth: 1,
-          marginBottom: 12,
-          paddingHorizontal: 8,
-          borderRadius: 15,
-          elevation: 2,
-          backgroundColor: '#fefefe',
-        }}>
+      <View style={{ backgroundColor: '#fff', elevation: 5, padding: 15, borderRadius: 8 }}>
+        <View
+          style={styles.centerView}>
+          <Image
+            style={styles.tinyLogo}
+            source={SamAi}
+          />
+        </View>
+        <Text
+          style={styles.heading}>
+          Welcome to SAMAI Review Board
+        </Text>
         <TextInput
-          style={{width: 300}}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!isPasswordVisible} // Toggle visibility
-        />
-        <TouchableOpacity onPress={togglePasswordVisibility}>
-          {isPasswordVisible ? <VisibilityOn /> : <VisibilityOff />}
-        </TouchableOpacity>
-      </View>
-      <View style={{justifyContent: 'center', alignItems: 'center'}}>
-        <TouchableOpacity
-          style={{
-            width: '98%',
-            height: 50,
-            backgroundColor: '#00a3f9',
-            elevation: 1,
-            borderRadius: 16,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-          onPress={handleLogin}>
-          {loading ?  (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-          ) : (
-            <Text style={{fontSize: 18, color: 'white', fontWeight: '400'}}>
-            Login
-          </Text>
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none" />
 
-          )}
-        </TouchableOpacity>
+        <View
+          style={styles.inputView}>
+          <TextInput
+            style={{ width: 300 }}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!isPasswordVisible} // Toggle visibility
+          />
+          <TouchableOpacity onPress={togglePasswordVisibility}>
+            {isPasswordVisible ? <VisibilityOn /> : <VisibilityOff />}
+          </TouchableOpacity>
+        </View>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={handleLogin}>
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#0000ff" />
+              </View>
+            ) : (
+              <Text style={{ fontSize: 18, color: 'white', fontWeight: '400' }}>
+                Login
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
       {/* <Button title="Login" /> */}
       <View style={styles.spacer} />
@@ -157,16 +144,32 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 16,
+  }, heading: {
+    fontSize: 20,
+    color: 'black',
+    fontWeight: '500',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+  tinyLogo: {
+    width: 75,
+    height: 75,
+  },
+  centerView: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   input: {
     height: 50,
-    borderColor: 'gray',
+    borderColor: '#fff',
     borderWidth: 1,
     marginBottom: 12,
     paddingHorizontal: 8,
-    borderRadius: 15,
-    // elevation: 2,
+    borderRadius: 8,
+    elevation: 5,
     backgroundColor: '#fefefe',
+
   },
   spacer: {
     height: 20,
@@ -180,6 +183,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  btn: {
+    width: '98%',
+    height: 50,
+    backgroundColor: '#00a3f9',
+    elevation: 1,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  }, inputView: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 50,
+    borderColor: '#fff',
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    elevation: 5,
+    backgroundColor: '#fefefe',
   },
 });
 
