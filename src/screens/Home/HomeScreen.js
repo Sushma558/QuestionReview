@@ -51,7 +51,8 @@ const HomeScreen = ({route}) => {
   const [reviewrejected, setreviewrejected] = useState([]);
   const {user, changeUser} = useUserData();
   useEffect(() => {
-    if (user) {
+    console.log('home user',user)
+    if (user && user!={}) {
       if (user?.userType == 'Admin') {
         firestore().collection('SAMAISections')
           .orderBy('addedOn', 'desc')

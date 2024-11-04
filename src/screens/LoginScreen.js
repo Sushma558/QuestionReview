@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   TextInput,
@@ -15,8 +15,8 @@ import VisibilityOn from '../assets/VisibilityOn';
 import VisibilityOff from '../assets/VisibilityOff';
 import SamAi from '../assets/SamAi.png';
 import firestore from '@react-native-firebase/firestore';
-import { useNavigation } from '@react-navigation/native';
-import { useUserData } from '../../UserContext';
+import {useNavigation} from '@react-navigation/native';
+import {useUserData} from '../../UserContext';
 // Test credentials
 const TEST_EMAIL = 'test@example.com';
 const TEST_PASSWORD = 'password123';
@@ -26,7 +26,7 @@ const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState();
-  const navigation=useNavigation();
+  const navigation = useNavigation();
   const {user, changeUser} = useUserData();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -34,20 +34,20 @@ const LoginScreen = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-  const getUserDetails = (userId) => {
-    firestore().collection("SamaiReviewUsers")
+  const getUserDetails = userId => {
+    firestore()
+      .collection('SamaiReviewUsers')
       .doc(userId)
       .get()
-      .then((res) => {
+      .then(res => {
         setUserData(res.data());
         // getUserDetails(res.user.uid);
         console.log(res.data());
-        navigation.navigate("Home", { userdata: res.data()} );
         changeUser(res.data());
-        console.log("Home", { userdata: res.data() });
-
+        navigation.navigate('Home', {userdata: res.data()});
+        console.log('Home', {userdata: res.data()});
       })
-      .catch((err) => {
+      .catch(err => {
         console.log(err);
       });
   };
@@ -70,11 +70,19 @@ const LoginScreen = () => {
           password,
         );
         console.log('User signed in successfully');
-        console.log('User data:', typeof(userCredential.user),(userCredential.user));
-        console.log('User data2:', typeof(userCredential.user.uid),(userCredential.user.uid));
+        console.log(
+          'User data:',
+          typeof userCredential.user,
+          userCredential.user,
+        );
+        console.log(
+          'User data2:',
+          typeof userCredential.user.uid,
+          userCredential.user.uid,
+        );
         getUserDetails(userCredential.user.uid);
         setLoading(false);
-        
+
         // navigation.navigate('Home',{userdata:JSON.stringify(userCredential.user,)});
       }
     } catch (error) {
@@ -85,30 +93,29 @@ const LoginScreen = () => {
   };
   return (
     <View style={styles.container}>
-      <View style={{ backgroundColor: '#fff', elevation: 5, padding: 15, borderRadius: 8 }}>
-        <View
-          style={styles.centerView}>
-          <Image
-            style={styles.tinyLogo}
-            source={SamAi}
-          />
+      <View
+        style={{
+          backgroundColor: '#fff',
+          elevation: 5,
+          padding: 15,
+          borderRadius: 8,
+        }}>
+        <View style={styles.centerView}>
+          <Image style={styles.tinyLogo} source={SamAi} />
         </View>
-        <Text
-          style={styles.heading}>
-          Welcome to SAMAI Review Board
-        </Text>
+        <Text style={styles.heading}>Welcome to SAMAI Review Board</Text>
         <TextInput
           style={styles.input}
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
-          autoCapitalize="none" />
+          autoCapitalize="none"
+        />
 
-        <View
-          style={styles.inputView}>
+        <View style={styles.inputView}>
           <TextInput
-            style={{ width: 300 }}
+            style={{width: 300}}
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
@@ -118,16 +125,14 @@ const LoginScreen = () => {
             {isPasswordVisible ? <VisibilityOn /> : <VisibilityOff />}
           </TouchableOpacity>
         </View>
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <TouchableOpacity
-            style={styles.btn}
-            onPress={handleLogin}>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <TouchableOpacity style={styles.btn} onPress={handleLogin}>
             {loading ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#0000ff" />
               </View>
             ) : (
-              <Text style={{ fontSize: 18, color: 'white', fontWeight: '400' }}>
+              <Text style={{fontSize: 18, color: 'white', fontWeight: '400'}}>
                 Login
               </Text>
             )}
@@ -146,7 +151,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 16,
-  }, heading: {
+  },
+  heading: {
     fontSize: 20,
     color: 'black',
     fontWeight: '500',
@@ -171,7 +177,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 5,
     backgroundColor: '#fefefe',
-
   },
   spacer: {
     height: 20,
@@ -195,7 +200,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 5,
-  }, inputView: {
+  },
+  inputView: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',

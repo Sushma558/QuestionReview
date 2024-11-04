@@ -7,12 +7,14 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Modal from 'react-native-modal';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+// import Icon from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import axios from 'axios';
 // import axios from "axios";
 
 const TestScheduleScreen = () => {
@@ -35,6 +37,10 @@ const navigation = useNavigation();
   const [selectedChapters, setSelectedChapters] = useState([]);
   const [expandedChapter, setExpandedChapter] = useState(null);
   const [selectedTopics, setSelectedTopics] = useState({});
+  const [subjectsData,  setSubjectsData] = useState([]);
+  const [chapterData, setChapterdata] = useState([]);
+  const [topicData, setTopicdata] = useState([]);
+
 
   // Define all options
   const classOptions = ['11th', '12th'];
@@ -157,6 +163,35 @@ const navigation = useNavigation();
       .then((response) => setSubjectsData(response.data.entities));
   };
 
+  // console.log('subjectsData:', subjectsData);
+  const fetchChapter = (subject_id) => {
+    axios
+      .get("https://mep.scontiapp.com/samai/v1/api/v1/entity/all", {
+        params: {
+          exam_id: "2df8f075-e95a-4126-a80d-7a68b7e4c31e",
+          parent_id: subject_id,
+          type: "topic",
+        },
+      })
+      .then((res) => {
+        setChapterdata(res.data.entities);
+      });
+  };
+
+  const fetchTopics = (chapter_id) => {
+    axios
+      .get("https://mep.scontiapp.com/samai/v1/api/v1/entity/all", {
+        params: {
+          exam_id: "2df8f075-e95a-4126-a80d-7a68b7e4c31e",
+          parent_id: chapter_id,
+          type: "subtopic",
+        },
+      })
+      .then((res) => {
+        setTopicdata(res.data.entities);
+      });
+  };
+
   // Handlers
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -169,6 +204,10 @@ const navigation = useNavigation();
     setSelectedTestType(type);
     setShowTestTypeModal(false);
   };
+
+  useEffect(()=>{
+    fetchSubjects("11")
+  },[]);
 
   const handleSchedulePress = () => {
     // Check if all required fields are filled
@@ -290,7 +329,7 @@ const navigation = useNavigation();
           <Icon name="check" size={16} color="#4a90e2" />
         )}
       </View>
-      <Text style={styles.optionText}>{item}</Text>
+      <Text style={styles.optionText}>{item?.entity_name}</Text>
     </TouchableOpacity>
   );
 
@@ -337,24 +376,24 @@ const navigation = useNavigation();
   };
 
   // Modify handleChapterSelect
-  const handleChapterSelect = (chapter) => {
+  const handleChapterSelect = (Chapters) => {
     setSelectedChapters((prev) => {
-      const isSelected = prev.includes(chapter);
+      const isSelected = prev.includes(chapters);
       const newChapters = isSelected
-        ? prev.filter((item) => item !== chapter)
-        : [...prev, chapter];
+        ? prev.filter((item) => item !== chapters)
+        : [...prev, chapters];
 
       // Update selected topics when chapter is unselected
       if (isSelected) {
         setSelectedTopics((prevTopics) => {
           const newTopics = { ...prevTopics };
-          delete newTopics[chapter];
+          delete newTopics[chapters];
           return newTopics;
         });
       } else {
         setSelectedTopics((prevTopics) => ({
           ...prevTopics,
-          [chapter]: [],
+          [chapters]: [],
         }));
       }
 
@@ -363,16 +402,16 @@ const navigation = useNavigation();
   };
 
   // Add topic selection handler
-  const handleTopicSelect = (chapter, topic) => {
+  const handleTopicSelect = (chapters, topic) => {
     setSelectedTopics((prev) => {
-      const chapterTopics = prev[chapter] || [];
+      const chapterTopics = prev[chapters] || [];
       const updatedTopics = chapterTopics.includes(topic)
         ? chapterTopics.filter((t) => t !== topic)
         : [...chapterTopics, topic];
 
       return {
         ...prev,
-        [chapter]: updatedTopics,
+        [chapters]: updatedTopics,
       };
     });
   };
@@ -397,7 +436,7 @@ const navigation = useNavigation();
             )}
           </View>
           <Text style={styles.optionText}>{item}</Text>
-          {chapterTopics[item] && (
+          {chapterData[item] && (
             <Icon
               name={
                 expandedChapter === item
@@ -451,10 +490,9 @@ const navigation = useNavigation();
                 style={styles.pickerButton}
                 onPress={() => setShowDatePicker(true)}
               >
-                <Icon
-                  name="calendar-today"
+                <Icon name="calendar"
                   size={20}
-                  color="#fff"
+                  color="#fff"  
                   style={styles.icon}
                 />
                 <Text style={styles.buttonText}>
@@ -565,7 +603,7 @@ const navigation = useNavigation();
                 <Icon name="book" size={20} color="#fff" style={styles.icon} />
                 <Text style={styles.buttonText}>
                   {selectedSubjects.length > 0
-                    ? `${selectedSubjects.length} Subjects`
+                    ?` ${selectedSubjects.length} Subjects`
                     : 'Subjects'}
                 </Text>
               </TouchableOpacity>
@@ -630,11 +668,13 @@ const navigation = useNavigation();
         </Modal>
 
         {/* Subject Modal */}
+        
         <Modal
           isVisible={showSubjectModal}
           onBackdropPress={() => setShowSubjectModal(false)}
           style={styles.bottomModal}
           backdropTransitionOutTiming={0}
+          
         >
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
@@ -642,12 +682,13 @@ const navigation = useNavigation();
               <TouchableOpacity
                 style={styles.closeIconContainer}
                 onPress={() => setShowSubjectModal(false)}
+                
               >
                 <Icon name="close" size={24} color="#555" />
               </TouchableOpacity>
             </View>
             <FlatList
-              data={getAvailableSubjects()}
+              data={subjectsData}
               keyExtractor={(item) => item}
               renderItem={({ item }) =>
                 renderClassCheckbox({
@@ -656,7 +697,9 @@ const navigation = useNavigation();
                   onSelect: handleSubjectSelect,
                 })
               }
+              
             />
+            
           </View>
         </Modal>
 
@@ -678,7 +721,7 @@ const navigation = useNavigation();
               </TouchableOpacity>
             </View>
             <FlatList
-              data={getAvailableChapters()}
+              data={chapterData}
               keyExtractor={(item) => item}
               renderItem={({ item }) =>
                 renderChapterItem({
@@ -727,7 +770,7 @@ const navigation = useNavigation();
               <View style={styles.scheduleRow}>
                 <Text style={styles.scheduleLabel}>Subjects:</Text>
                 <Text style={styles.scheduleValue}>
-                  {selectedSubjects.join(', ')}
+                {selectedSubjects.map(subject => subject.entity_name).join(', ')}
                 </Text>
               </View>
             )}
@@ -737,17 +780,17 @@ const navigation = useNavigation();
                 <View style={styles.scheduleRow}>
                   <Text style={styles.scheduleLabel}>Chapters:</Text>
                   <Text style={styles.scheduleValue}>
-                    {selectedChapters.join(', ')}
+                  {selectedChapters.map(chapter => chapter.entity_name).join(', ')}
                   </Text>
                 </View>
-                {Object.entries(selectedTopics).map(([chapter, topics]) =>
+                {Object.entries(topicData).map(([chapter, topics]) =>
                   topics.length > 0 ? (
                     <View key={chapter} style={styles.scheduleRow}>
                       <Text style={[styles.scheduleLabel, { fontSize: 13 }]}>
                         {chapter} Topics:
                       </Text>
                       <Text style={[styles.scheduleValue, { fontSize: 13 }]}>
-                        {topics.join(', ')}
+                      {topics.map(topic => topic.entity_name).join(', ')}
                       </Text>
                     </View>
                   ) : null
