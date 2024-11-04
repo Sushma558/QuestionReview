@@ -40,12 +40,13 @@ const Question = ({
   const [loading, setLoading] = useState(false);
 
   const isPushed = pushedQuestions.includes(item.id); // Check if the question is already pushed
-  console.table([item]);
+
 
   const handlePush = item => {
     // Add the pushed question to the state
-    setPushedQuestions(prevState => [...prevState, item.id]);
-    handleSingleQUestionPush();
+    // setPushedQuestions(prevState => [...prevState, item.id]);
+    // handleSingleQUestionPush();
+    console.log(item)
   };
   const handleSingleQUestionPush = () => {
     const data = {

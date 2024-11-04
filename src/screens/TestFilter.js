@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,8 +11,8 @@ import {
   Button,
   Dimensions,
 } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { Picker } from '@react-native-picker/picker';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Question from '../components/Question';
 import firestore from '@react-native-firebase/firestore';
 
@@ -64,7 +64,7 @@ function TestScreen() {
       .then(snapShot => {
         var sections = [];
         snapShot.docs.map(item => {
-          sections.push({...item.data(), id: item.id});
+          sections.push({ ...item.data(), id: item.id });
         });
         setAllSections(sections);
         setLoading(false);
@@ -77,6 +77,7 @@ function TestScreen() {
       .then(snap => {
         const reviewersWithApprove = snap.docs.map(
           doc => `${doc.data()?.userId}-approve`,
+        
         );
         setReviewersapprove(reviewersWithApprove);
       });
@@ -179,10 +180,11 @@ function TestScreen() {
               .map((item, index) => (
                 <Picker.Item key={index} label={item?.name} value={item} />
               ))}
+
           </Picker>
         </View>
       </View>
-      <View style={{width: WIDTH * 0.9, alignSelf: 'center'}}>
+      <View style={{ width: WIDTH * 0.9, alignSelf: 'center' }}>
         <TouchableOpacity
           style={{
             width: '98%',
@@ -204,12 +206,13 @@ function TestScreen() {
               ToastAndroid.show('Please wait...', ToastAndroid.SHORT);
             }
           }}>
-          <Text style={{fontSize: 18, color: 'white', fontWeight: '400'}}>
+          <Text style={{ fontSize: 18, color: 'white', fontWeight: '400' }}>
             Review Questions
           </Text>
         </TouchableOpacity>
       </View>
       <View style={{width: WIDTH * 0.9, alignSelf: 'center', marginTop: 15}}>
+
         <TouchableOpacity
           style={{
             width: '98%',
@@ -268,6 +271,49 @@ function TestScreen() {
         </TouchableOpacity>
       </View>
   
+          <Text style={{ fontSize: 18, color: 'white', fontWeight: '400' }}>
+           See All
+          </Text>
+        </TouchableOpacity>
+      </View>
+      {/* <View style={styles.dropdownContainer1}>
+        <Text style={styles.filterLabel}>Subject:</Text>
+        <Picker
+          selectedValue={selectedSubject}
+          style={styles.picker}
+          onValueChange={(itemValue) => handleSubjectChange(itemValue)}
+        >
+          <Picker.Item label="Subject " value=" " />
+          <Picker.Item label="Physics" value="Physics" />
+          <Picker.Item label="Chemistry" value="Chemistry" />
+          <Picker.Item label="Botonoy" value="Botonoy" />
+          <Picker.Item label="Zology" value="Zology" />
+          <Picker.Item label="Biology" value="Biology" />
+        </Picker>
+      </View> */}
+
+      {/* <FlatList
+        style={styles.flatList}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={item => item.question_id.toString()}
+        data={filteredQuestions}
+        renderItem={({item, index}) => (
+          <View>
+            <Question
+              item={item}
+              index={index}
+              isRetake={false}
+              isSimilar={false}
+              isDaily={false}
+            />
+            <TouchableOpacity
+              style={styles.pushButton}
+              onPress={() => handlePushButtonPress(item.question_id)}>
+              <Text style={styles.pushButtonText}>Push</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      /> */}
     </SafeAreaView>
   );
 }

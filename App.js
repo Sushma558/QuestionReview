@@ -27,7 +27,6 @@ import Event from './src/assets/Event';
 import AddCardForReview from './src/screens/Home/AddCardForReview';
 
 const Tab = createBottomTabNavigator();
-
 const Stack = createStackNavigator();
 const BottomTabNavigator = () => {
   return (
@@ -173,6 +172,11 @@ export default function App() {
           name="addreviewcard"
           component={AddCardForReview}
           options={{title: 'Add card for review Page'}}
+        />
+        <Stack.Screen
+          name="seeall"
+          component={SeeAllPYQ}
+          options={{ title: 'All Questions Page' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
