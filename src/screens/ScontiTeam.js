@@ -13,7 +13,7 @@ import {useRoute} from '@react-navigation/native';
 import Question from '../components/Question';
 import firestore from '@react-native-firebase/firestore';
 
-function SeeAllPYQ({navigation}) {
+function ScontiTeam({navigation}) {
   const [selected, setSelected] = useState();
   const [errorText, setErrorText] = useState();
   const route = useRoute();
@@ -30,12 +30,12 @@ function SeeAllPYQ({navigation}) {
   }, [route?.params]);
 
   const fetchQuestions = (reviewers) => {
+    console.log(reviewers)
     let query = firestore()
       .collection('NEETReviewQNS')
-      .where('reviewCode', '==', route?.params?.selected?.reviewCode)
-    //   .where('reviewStatus','array-contains-any', reviewers)
+      .where('reviewStatus','array-contains-any', reviewers)
       .where('isPushed','==',false)
-      .orderBy('addedOn', 'asc')
+      .orderBy('reviewedOn', 'desc')
       .limit(10);
 
     if (lastDoc) {
@@ -114,5 +114,7 @@ const styles = StyleSheet.create({
 
 });
 
-export default SeeAllPYQ;
+export default ScontiTeam;
+ ;
+
 

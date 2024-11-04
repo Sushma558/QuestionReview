@@ -67,7 +67,7 @@ function EquationRendererText({content}) {
   };
 
   // Split content by newline (\n) and render each part
-  const contentParts = content.split('\\n');
+  const contentParts = (content || '').split('\\n');
 
   return (
     <View style={{flexDirection: 'column', alignSelf: 'stretch'}}>

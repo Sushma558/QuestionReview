@@ -16,6 +16,7 @@ import EquationRendererText from './EquationRendereText';
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import { useNavigation } from '@react-navigation/native';
 
 const {width: screenWidth} = Dimensions.get('window');
 const figmaDesignWidth = 375;
@@ -23,7 +24,7 @@ const scale = screenWidth / figmaDesignWidth;
 const WIDTH = Dimensions.get('screen').width;
 const HEIGHT = Dimensions.get('screen').height;
 
-const Question = ({
+const QuestionComponent = ({
   item,
   index,
   isRetake,
@@ -36,121 +37,7 @@ const Question = ({
     const latexPattern = /(\$.*?\$|\\\(|\\\)|\\[a-zA-Z]+)/;
     return latexPattern.test(text);
   };
-  const [pushedQuestions, setPushedQuestions] = useState([]); // Track pushed questions
-  const [loading, setLoading] = useState(false);
-
-  const isPushed = pushedQuestions.includes(item.id); // Check if the question is already pushed
-
-
-  const handlePush = item => {
-    // Add the pushed question to the state
-    // setPushedQuestions(prevState => [...prevState, item.id]);
-    // handleSingleQUestionPush();
-    console.log(item)
-  };
-  const handleSingleQUestionPush = () => {
-    const data = {
-      questions: [
-        {
-          language_name: 'English',
-          correct_option: item?.correctanswer,
-          option_a:
-            item?.options[0]?.text &&
-            item?.options[0]?.text?.toLowerCase() != 'nan' &&
-            item?.options[0]?.text != NaN
-              ? item?.options[0]?.text
-              : '',
-          option_b:
-            item?.options[1]?.text &&
-            item?.options[1]?.text != 'nan' &&
-            item?.options[1]?.text != NaN
-              ? item?.options[1]?.text
-              : '',
-          option_c:
-            item?.options[2]?.text &&
-            item?.options[2]?.text != 'nan' &&
-            item?.options[2]?.text != NaN
-              ? item?.options[2]?.text
-              : '',
-          option_d:
-            item?.options[3]?.text &&
-            item?.options[3]?.text != 'nan' &&
-            item?.options[3]?.text != NaN
-              ? item?.options[3]?.text
-              : '',
-          question_categories: item?.solvingtips,
-          question_text: item?.question,
-          short_explanation: item?.explanation,
-          question_type: reviewData?.from === 'pyq' ? 'pyq' : 'generated',
-          exam_id: '2df8f075-e95a-4126-a80d-7a68b7e4c31e',
-          subject_id: item?.subjectData?.subject_id,
-          topic_id: item?.unit?.unit_id,
-          sub_topic_id: item?.sub_topic?.sub_topic_id,
-          difficulty_level: item?.difficultyLevel ? item?.difficultyLevel : '1',
-          user_id: auth()?.currentUser?.uid,
-          image_url: item?.questionImage,
-          option_a_image_url: item?.options[0]?.image
-            ? item?.options[0]?.image
-            : '',
-          option_b_image_url: item?.options[1]?.image
-            ? item?.options[1]?.image
-            : '',
-          option_c_image_url: item?.options[2]?.image
-            ? item?.options[2]?.image
-            : '',
-          option_d_image_url: item?.options[3]?.image
-            ? item?.options[3]?.image
-            : '',
-          year:
-            reviewData?.from === 'pyq'
-              ? item?.year && item?.year != ''
-                ? Number.parseInt(item?.year)
-                : 2024
-              : 2024,
-          //  need to add pyq and need to mention the year body parameter
-          // need to change the userid
-        },
-      ],
-    };
-    console.log('pushed', data);
-    if (
-      item?.subjectData?.subject_id &&
-      item?.unit?.unit_id &&
-      item?.sub_topic?.sub_topic_id
-    ) {
-      setLoading(true);
-      axios
-        .post(
-          'https://mep.scontiapp.com/samai/v1/api/v1/question/add_questions',
-          data,
-        )
-        .then(response => {
-          console.log('question', data);
-          console.log('Single question pushed', response.data);
-          pushSingleQuestion(response.data?.question_ids[0]);
-          setLoading(false);
-          ToastAndroid.show('Question pushed!', ToastAndroid.SHORT);
-        })
-        .catch(error => console.error('Error:', error));
-    } else {
-      Alert.alert(
-        'Subject name,Chapter name and Topic name should be there to push to database',
-      );
-      setLoading(false);
-    }
-  };
-
-  const pushSingleQuestion = id => {
-    firestore()
-      .collection('NEETReviewQNS')
-      .doc(item?.id)
-      .update({
-        pushedOn: new Date(),
-        pushedBy: auth()?.currentUser?.email,
-        isPushed: true,
-        dbaddedquestionid: id ? id : 'N/A',
-      });
-  };
+  const navigation=useNavigation();
 
   return (
     <View key={item?.question_id} style={styles.questionContainer}>
@@ -230,29 +117,78 @@ const Question = ({
         <View
           style={{
             marginTop: 25,
+            flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          {loading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-          ) : (
-            <TouchableOpacity
-              style={[styles.pushButton, isPushed && styles.disabledButton]}
-              onPress={() => handlePush(item)}
-              // onPressIn={()=>{
-              //   handleSingleQUestionPush();
-              //   fetchSingleQuestionFromFirebase();
-              // }}
-              disabled={isPushed} // Disable if the question is pushed
-            >
-              <Text style={styles.pushButtonText}>
-                {isPushed ? 'Pushed' : 'Push'}
-              </Text>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity
+            style={[styles.pushButton, isPushed && styles.disabledButton]}
+            
+          >
+            <Text style={styles.pushButtonText}>Approve</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.pushButton, isPushed && styles.disabledButton]}
+           
+          >
+            <Text style={styles.pushButtonText}>Reject</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.pushButton, isPushed && styles.disabledButton]}
+            onPress={() => {
+                navigation.navigate('edit');
+              }}
+           
+          >
+            <Text style={styles.pushButtonText}>Edit</Text>
+          </TouchableOpacity>
         </View>
+        <View style={styles.acccontainer}>
+      {/* Section 1 */}
+      <ListItem.Accordion
+        content={
+          <ListItem.Content>
+            <ListItem.Title>Section 1</ListItem.Title>
+          </ListItem.Content>
+        }
+        isExpanded={expanded.section1}
+        onPress={() => toggleAccordion('section1')}
+      >
+        <View style={styles.acccontent}>
+          <Text>This is the content for Section 1</Text>
+        </View>
+      </ListItem.Accordion>
+
+      {/* Section 2 */}
+      <ListItem.Accordion
+        content={
+          <ListItem.Content>
+            <ListItem.Title>Section 2</ListItem.Title>
+          </ListItem.Content>
+        }
+        isExpanded={expanded.section2}
+        onPress={() => toggleAccordion('section2')}
+      >
+        <View style={styles.acccontent}>
+          <Text>This is the content for Section 2</Text>
+        </View>
+      </ListItem.Accordion>
+
+      {/* Section 3 */}
+      <ListItem.Accordion
+        content={
+          <ListItem.Content>
+            <ListItem.Title>Section 3</ListItem.Title>
+          </ListItem.Content>
+        }
+        isExpanded={expanded.section3}
+        onPress={() => toggleAccordion('section3')}
+      >
+        <View style={styles.acccontent}>
+          <Text>This is the content for Section 3</Text>
+        </View>
+      </ListItem.Accordion>
+    </View>
       </View>
     </View>
   );
@@ -332,6 +268,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  acccontainer: {
+    flex: 1,
+    padding: 10,
+  },
+  acccontent: {
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+  },
 });
 
-export default Question;
+export default QuestionComponent;

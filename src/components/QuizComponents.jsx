@@ -64,33 +64,8 @@ const QuizComponents = props => {
                   ) : (
                     <View />
                   )}
-                  {/* {containsLatex(option?.text) ? (
-                    <MathText
-                      value={option?.text?.replace(
-                        /\(a\)|\(b\)|\(c\)|\(d\)/g,
-                        ""
-                      )}
-                      direction="ltr"
-                      CellRendererComponent={
-                        <Text
-                          style={[
-                           
-                            { color: "#101828", lineHeight: 20, fontSize:14, fontWeight:'500' },
-                          ]}
-                        />
-                      }
-                    />
-                  ) : (
-                    <Text
-                      style={[
-                        { color: "#101828", lineHeight: 20,fontSize:14, fontWeight:'500' },
-                      ]}
-                    >
-                      {option?.text
-                        ? option?.text?.replace(/\(a\)|\(b\)|\(c\)|\(d\)/g, "")
-                        : ""}
-                    </Text>
-                  )} */}
+
+                 
                   <EquationRenderOption
                     content={
                       option?.text
@@ -110,11 +85,11 @@ const QuizComponents = props => {
 };
 const styles = StyleSheet.create({
   btnOption: {
-    // backgroundColor: selectedOption === option.id ? '#2f667f' : 'white',
+ 
     padding: 5,
     marginBottom: 0,
     borderRadius: 25,
-    // flexDirection: "row",
+
     justifyContent: 'center', // Adjusted to start from the left
     alignItems: 'center',
     width: '95%',
@@ -136,8 +111,7 @@ const styles = StyleSheet.create({
     fontFamily: 'NotoSans-Medium',
     marginRight: 5,
     color: 'black',
-    // fontFamily: 'BentonSans-Regular'
-    // color: selectedOption === option.id ? 'white' : 'black',
+
   },
   optionTxtDarkMode: {
     fontSize: 14,
@@ -146,8 +120,7 @@ const styles = StyleSheet.create({
     fontFamily: 'NotoSans-Regular',
     marginRight: 5,
     color: 'white',
-    // fontFamily: 'BentonSans-Regular'
-    // color: selectedOption === option.id ? 'white' : 'black',
+
   },
   optionTxtRight: {
     fontSize: 14,
@@ -156,8 +129,7 @@ const styles = StyleSheet.create({
     color: '#008000',
     fontFamily: 'NotoSans-Medium',
     marginRight: 5,
-    // fontFamily: 'BentonSans-Regular'
-    // color: selectedOption === option.id ? 'white' : 'black',
+
   },
   optionTxtWrong: {
     fontSize: 14,
@@ -166,7 +138,7 @@ const styles = StyleSheet.create({
     color: '#ff0000',
     fontFamily: 'NotoSans-Medium',
     marginRight: 5,
-    // fontFamily: 'BentonSans-Regular'
+
   },
   optionTxtIndex: {
     fontSize: 14,
@@ -175,8 +147,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     marginRight: 5,
     color: 'black',
-    // fontFamily: 'BentonSans-Regular'
-    // color: selectedOption === option.id ? 'white' : 'black',
+
   },
   optionTxtIndexDarkMode: {
     fontSize: 14,
@@ -185,8 +156,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     marginRight: 5,
     color: 'white',
-    // fontFamily: 'BentonSans-Regular'
-    // color: selectedOption === option.id ? 'white' : 'black',
+
   },
   optionTxtRightIndex: {
     fontSize: 14,
@@ -195,8 +165,7 @@ const styles = StyleSheet.create({
     fontFamily: 'NotoSans-Medium',
     marginRight: 5,
     textAlignVertical: 'center',
-    // fontFamily: 'BentonSans-Regular'
-    // color: selectedOption === option.id ? 'white' : 'black',
+
   },
   optionTxtWrongIndex: {
     fontSize: 14,
@@ -205,7 +174,6 @@ const styles = StyleSheet.create({
     fontFamily: 'NotoSans-Medium',
     marginRight: 5,
     textAlignVertical: 'center',
-    // fontFamily: 'BentonSans-Regular'
   },
 });
 
