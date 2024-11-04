@@ -100,6 +100,7 @@ const ReviewMainPage = () => {
     const [reviewCode, setreviewCode] = useState();
     const [reviewapproved, setreviewapproved] = useState([]);
     const [reviewrejected, setreviewrejected] = useState([]);
+    const [userdata, setuserdata] = useState("");
   useEffect(() => {
     if (userdata) {
       if (JSON.parse(userToken)?.userType == "Admin") {

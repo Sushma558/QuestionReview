@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -25,10 +25,17 @@ import Review from './src/assets/Review';
 import Add from './src/assets/Add';
 import Event from './src/assets/Event';
 import AddCardForReview from './src/screens/Home/AddCardForReview';
+import TestScheduleScreen from './src/screens/ScheduleScreen';
+import QuestionDisplay from './src/screens/QuestionDisplay';
+import { UserProvider, useUserData } from './UserContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const BottomTabNavigator = () => {
+  const {user, changeUser} = useUserData();
+  useEffect(()=>{
+    console.log("user details", user);
+  },[user]);
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
@@ -62,7 +69,7 @@ const BottomTabNavigator = () => {
         headerShown: false,
       })}>
       <Tab.Screen
-        name="Home"
+        name="Homes"
         component={HomeScreen}
         options={{
           headerShown: true,
@@ -81,7 +88,7 @@ const BottomTabNavigator = () => {
       />
       <Tab.Screen
         name="Schedule"
-        component={ScheduleScreen}
+        component={TestScheduleScreen}
         options={{headerShown: true, tabBarIcon: () => <Event />}}
       />
     </Tab.Navigator>
@@ -90,6 +97,7 @@ const BottomTabNavigator = () => {
 
 export default function App() {
   return (
+    <UserProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen
@@ -174,12 +182,18 @@ export default function App() {
           options={{title: 'Add card for review Page'}}
         />
         <Stack.Screen
+          name="QuestionDisplay"
+          component={QuestionDisplay}
+          options={{title: 'Questions'}}
+        />
+        {/* <Stack.Screen
           name="seeall"
           component={SeeAllPYQ}
           options={{ title: 'All Questions Page' }}
-        />
+        /> */}
       </Stack.Navigator>
     </NavigationContainer>
+    </UserProvider>
   );
 }
 const styles = StyleSheet.create({

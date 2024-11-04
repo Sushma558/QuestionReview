@@ -6,16 +6,19 @@ import {
   FlatList,
   ScrollView,
   Alert,
-
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
-import Modal from "react-native-modal";
+import { useNavigation } from '@react-navigation/native';
+// import axios from "axios";
 
+const TestScheduleScreen = () => {
 
-const ScheduleScreen = () => {
+const navigation = useNavigation();
+
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
@@ -27,8 +30,11 @@ const ScheduleScreen = () => {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [showChapterModal, setShowChapterModal] = useState(false);
   const [selectedChapter, setSelectedChapter] = useState('');
-  const [selectedTopic, setSelectedTopic] = useState('');
-  const [showTopics, setShowTopics] = useState(false);
+  const [selectedClasses, setSelectedClasses] = useState([]);
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const [selectedChapters, setSelectedChapters] = useState([]);
+  const [expandedChapter, setExpandedChapter] = useState(null);
+  const [selectedTopics, setSelectedTopics] = useState({});
 
   // Define all options
   const classOptions = ['11th', '12th'];
@@ -98,7 +104,9 @@ const ScheduleScreen = () => {
     ],
   };
 
-  const topics = {
+  //  / / Add the topics data structure
+
+  const chapterTopics = {
     'Chapter 1: Physical World': [
       'Physics: Scope and Excitement',
       'Nature of Physical Laws',
@@ -107,20 +115,46 @@ const ScheduleScreen = () => {
       'Conservation Laws',
     ],
     'Chapter 2: Units and Measurements': [
-      'The International System of Units',
-      'Measurement of Length',
-      'Measurement of Mass',
-      'Measurement of Time',
-      'Accuracy, Precision & Errors in Measurement',
+      'Need for Measurement',
+      'SI Units',
+      'Fundamental and Derived Units',
+      'Length, Mass, and Time Measurements',
+      'Accuracy and Precision of Instruments',
     ],
-    'Chapter 1: Basic Concepts': [
-      'Importance of Chemistry',
-      'States of Matter',
-      'Properties of Matter and their Measurement',
-      'Uncertainty in Measurement',
-      'Scientific Notation',
+    'Chapter 3: Motion in a Straight Line': [
+      'Position, Path Length and Displacement',
+      'Average Velocity and Speed',
+      'Instantaneous Velocity and Speed',
+      'Acceleration',
+      'Kinematic Equations',
     ],
-    // Add more topics for other chapters as needed
+    'Chapter 4: Motion in a Plane': [
+      'Scalar and Vector Quantities',
+      'Position and Displacement Vectors',
+      'Velocity and Acceleration in Plane',
+      'Projectile Motion',
+      'Uniform Circular Motion',
+    ],
+    'Chapter 5: Laws of Motion': [
+      'Force and Inertia',
+      "Newton's First Law",
+      "Newton's Second Law",
+      "Newton's Third Law",
+      'Types of Forces',
+    ],
+  };
+
+  const fetchSubjects = (classData) => {
+    axios
+      .get('https://mep.scontiapp.com/samai/v1/api/v1/entity/all', {
+        params: {
+          exam_id: '2df8f075-e95a-4126-a80d-7a68b7e4c31e',
+          parent_id: '2df8f075-e95a-4126-a80d-7a68b7e4c31e',
+          type: 'subject',
+          // subject_class: classData,
+        },
+      })
+      .then((response) => setSubjectsData(response.data.entities));
   };
 
   // Handlers
@@ -131,81 +165,292 @@ const ScheduleScreen = () => {
     setSelectedDate(currentDate.toLocaleDateString());
   };
 
-  const handleTestTypeSelect = type => {
+  const handleTestTypeSelect = (type) => {
     setSelectedTestType(type);
     setShowTestTypeModal(false);
   };
 
-  const handleClassSelect = selectedClass => {
-    setSelectedClass(selectedClass);
-    setShowClassModal(false);
-    setSelectedSubject(''); // Clear subject when class changes
-    setSelectedChapter(''); // Clear chapter when class changes
-  };
-
-  const handleSubjectSelect = subject => {
-    setSelectedSubject(subject);
-    setShowSubjectModal(false);
-    setSelectedChapter(''); // Clear chapter when subject changes
-  };
-
-  const handleChapterSelect = chapter => {
-    setSelectedChapter(chapter);
-    setShowChapterModal(false);
-  };
-
   const handleSchedulePress = () => {
-    // Add your scheduling logic here
-    // For example:
-    if (
-      selectedClass &&
-      selectedSubject &&
-      selectedChapter &&
+    // Check if all required fields are filled
+    const isValid =
+      selectedClasses.length > 0 &&
+      selectedSubjects.length > 0 &&
+      selectedChapters.length > 0 &&
       selectedTestType &&
-      selectedDate
-    ) {
-      // Proceed with scheduling
-      console.log('Scheduling test...');
-      // Add your API call or state update logic
+      selectedDate &&
+      Object.values(selectedTopics).some((topics) => topics.length > 0);
+
+    if (isValid) {
+      // Show confirmation alert
+      Alert.alert(
+        'Schedule Test',
+        'Do you want to schedule the test?',
+        [
+          {
+            text: 'NO',
+            style: 'cancel',
+            onPress: () => console.log('Test scheduling cancelled'),
+          },
+          {
+            text: 'YES',
+            style: 'default',
+            onPress: () => {
+              // Log the scheduling details
+              console.log('Scheduling test...', {
+                classes: selectedClasses,
+                subjects: selectedSubjects,
+                chapters: selectedChapters,
+                topics: selectedTopics,
+                testType: selectedTestType,
+                date: selectedDate,
+              });
+
+              // Navigate to Question Display screen after confirmation
+              navigation.navigate('QuestionDisplay', {
+                // Pass the selected data as navigation params if needed
+                scheduledData: {
+                  classes: selectedClasses,
+                  subjects: selectedSubjects,
+                  chapters: selectedChapters,
+                  topics: selectedTopics,
+                  testType: selectedTestType,
+                  date: selectedDate,
+                },
+              });
+            },
+          },
+        ],
+        {
+          cancelable: true,
+          userInterfaceStyle: 'light',
+        }
+      );
     } else {
-      // Show error message if any required field is missing
-      Alert.alert('Error', 'Please fill in all required fields');
+      // Show error alert if validation fails
+      Alert.alert(
+        'Error',
+        'Please fill in all required fields and select at least one topic per chapter',
+        [
+          {
+            text: 'OK',
+            style: 'default',
+          },
+        ]
+      );
     }
   };
 
   // Render Option Item Component
-  const renderOptionItem = ({item, selectedItem, onSelect, textStyle }) => (
+  const renderOptionItem = ({
+    item,
+    selectedItem,
+    onSelect,
+    textStyle = {},
+  }) => (
     <TouchableOpacity
       style={[
         styles.optionButton,
         selectedItem === item && styles.selectedOption,
       ]}
-      onPress={() => onSelect(item)}>
+      onPress={() => onSelect(item)}
+    >
       <Text
         style={[
           styles.optionText,
           selectedItem === item && styles.selectedText,
           textStyle,
-        ]}>
+        ]}
+      >
         {item}
       </Text>
     </TouchableOpacity>
   );
 
+  const renderCheckboxItem = ({ item, selectedItems, onSelect }) => (
+    <TouchableOpacity
+      style={styles.checkboxContainer}
+      onPress={() => onSelect(item)}
+    >
+      <View style={styles.checkbox}>
+        {selectedItems.includes(item) && (
+          <Icon name="check" size={16} color="#4a90e2" />
+        )}
+      </View>
+      <Text style={styles.optionText}>{item}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderClassCheckbox = ({ item, selectedItems, onSelect }) => (
+    <TouchableOpacity
+      style={styles.checkboxContainer}
+      onPress={() => onSelect(item)}
+    >
+      <View style={styles.checkbox1}>
+        {selectedItems.includes(item) && (
+          <Icon name="check" size={16} color="#4a90e2" />
+        )}
+      </View>
+      <Text style={styles.optionText}>{item}</Text>
+    </TouchableOpacity>
+  );
+
+  const handleSubjectChange = (event) => {
+    // setCollegeYear(event.target.value);
+    fetchSubjects(event.target.value);
+    validateForm();
+  };
+
+
+  // Handle selection functions
+  const handleClassSelect = (classItem) => {
+    setSelectedClasses((prev) =>
+      prev.includes(classItem)
+        ? prev.filter((item) => item !== classItem)
+        : [...prev, classItem]
+    );
+  };
+
+  const handleSubjectSelect = (subject) => {
+    setSelectedSubjects((prev) =>
+      prev.includes(subject)
+        ? prev.filter((item) => item !== subject)
+        : [...prev, subject]
+    );
+  };
+
+  // Get available subjects based on selected classes
+  const getAvailableSubjects = () => {
+    const availableSubjects = new Set();
+    selectedClasses.forEach((classItem) => {
+      subjects[classItem]?.forEach((subject) => availableSubjects.add(subject));
+    });
+    return Array.from(availableSubjects);
+  };
+
+  // Get available chapters based on selected subjects
+  const getAvailableChapters = () => {
+    const availableChapters = new Set();
+    selectedSubjects.forEach((subject) => {
+      chapters[subject]?.forEach((chapter) => availableChapters.add(chapter));
+    });
+    return Array.from(availableChapters);
+  };
+
+  // Modify handleChapterSelect
+  const handleChapterSelect = (chapter) => {
+    setSelectedChapters((prev) => {
+      const isSelected = prev.includes(chapter);
+      const newChapters = isSelected
+        ? prev.filter((item) => item !== chapter)
+        : [...prev, chapter];
+
+      // Update selected topics when chapter is unselected
+      if (isSelected) {
+        setSelectedTopics((prevTopics) => {
+          const newTopics = { ...prevTopics };
+          delete newTopics[chapter];
+          return newTopics;
+        });
+      } else {
+        setSelectedTopics((prevTopics) => ({
+          ...prevTopics,
+          [chapter]: [],
+        }));
+      }
+
+      return newChapters;
+    });
+  };
+
+  // Add topic selection handler
+  const handleTopicSelect = (chapter, topic) => {
+    setSelectedTopics((prev) => {
+      const chapterTopics = prev[chapter] || [];
+      const updatedTopics = chapterTopics.includes(topic)
+        ? chapterTopics.filter((t) => t !== topic)
+        : [...chapterTopics, topic];
+
+      return {
+        ...prev,
+        [chapter]: updatedTopics,
+      };
+    });
+  };
+
+  // Modify renderCheckboxItem for chapters to include topics
+  const renderChapterItem = ({ item, selectedItems, onSelect }) => (
+    <View>
+      <TouchableOpacity
+        style={[
+          styles.checkboxContainer,
+          { paddingRight: 16 }, // Add padding for the expand icon
+        ]}
+        onPress={() => {
+          onSelect(item);
+          setExpandedChapter(expandedChapter === item ? null : item);
+        }}
+      >
+        <View style={styles.checkboxRow}>
+          <View style={styles.checkbox}>
+            {selectedItems.includes(item) && (
+              <Icon name="check" size={16} color="#4a90e2" />
+            )}
+          </View>
+          <Text style={styles.optionText}>{item}</Text>
+          {chapterTopics[item] && (
+            <Icon
+              name={
+                expandedChapter === item
+                  ? 'keyboard-arrow-up'
+                  : 'keyboard-arrow-down'
+              }
+              size={24}
+              color="#555"
+              style={styles.expandIcon}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+
+      {/* Topics dropdown */}
+      {expandedChapter === item &&
+        selectedItems.includes(item) &&
+        chapterTopics[item] && (
+          <View style={styles.topicsContainer}>
+            {chapterTopics[item].map((topic, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.topicCheckboxContainer}
+                onPress={() => handleTopicSelect(item, topic)}
+              >
+                <View style={styles.topiccheckbox}>
+                  {selectedTopics[item]?.includes(topic) && (
+                    <Icon name="check" size={14} color="#4a90e2" />
+                  )}
+                </View>
+                <Text style={styles.topicText}>{topic}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+    </View>
+  );
+
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView>
       <View style={styles.container}>
-        <Text style={styles.heading}> Schedule Test For SAMAI</Text>
         {/* First Row: Date and Test Type */}
         <View style={styles.row}>
           {/* Date Picker */}
           <View style={styles.pickerContainer}>
             <LinearGradient
               colors={['#4a90e2', '#357abd']}
-              style={styles.gradient}>
+              style={styles.gradient}
+            >
               <TouchableOpacity
                 style={styles.pickerButton}
-                onPress={() => setShowDatePicker(true)}>
+                onPress={() => setShowDatePicker(true)}
+              >
                 <Icon
                   name="calendar-today"
                   size={20}
@@ -231,10 +476,12 @@ const ScheduleScreen = () => {
           <View style={styles.pickerContainer}>
             <LinearGradient
               colors={['#4a90e2', '#357abd']}
-              style={styles.gradient}>
+              style={styles.gradient}
+            >
               <TouchableOpacity
                 style={styles.pickerButton}
-                onPress={() => setShowTestTypeModal(true)}>
+                onPress={() => setShowTestTypeModal(true)}
+              >
                 <Icon
                   name="assignment"
                   size={20}
@@ -249,89 +496,25 @@ const ScheduleScreen = () => {
           </View>
         </View>
 
-        {/* Second Row: Class, Subject, and Chapter */}
-        <View style={styles.row}>
-          {/* Class Selector */}
-          <View style={[styles.pickerContainer, {flex: 0.23}]}>
-            <LinearGradient
-              colors={['#43a047', '#2e7d32']}
-              style={styles.gradient}>
-              <TouchableOpacity
-                style={styles.pickerButton}
-                onPress={() => setShowClassModal(true)}>
-                <Icon
-                  name="school"
-                  size={20}
-                  color="#fff"
-                  style={styles.icon}
-                />
-                <Text style={styles.buttonText}>
-                  {selectedClass ? selectedClass : 'Class'}
-                </Text>
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
-
-          {/* Subject Selector */}
-          <View
-            style={[
-              styles.pickerContainer,
-              styles.subjectPickerContainer,
-              {flex: 0.47},
-            ]}>
-            <LinearGradient
-              colors={['#e53935', '#c62828']}
-              style={styles.gradient}>
-              <TouchableOpacity
-                style={styles.pickerButton}
-                onPress={() => setShowSubjectModal(true)}>
-                <Icon name="book" size={20} color="#fff" style={styles.icon} />
-                <Text style={styles.buttonText}>
-                  {selectedSubject ? selectedSubject : 'Subject'}
-                </Text>
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
-
-          {/* Chapter Selector */}
-          <View style={[styles.pickerContainer, {flex: 0.37}]}>
-            <LinearGradient
-              colors={['#7b1fa2', '#6a1b9a']}
-              style={styles.gradient}>
-              <TouchableOpacity
-                style={styles.pickerButton}
-                onPress={() => setShowChapterModal(true)}>
-                <Icon
-                  name="menu-book"
-                  size={20}
-                  color="#fff"
-                  style={styles.icon}
-                />
-                <Text style={styles.buttonText} numberOfLines={1}>
-                  {selectedChapter ? selectedChapter.split(':')[0] : 'Chapter'}
-                </Text>
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
-        </View>
-
         {/* Test Type Modal */}
         <Modal
           isVisible={showTestTypeModal}
           onBackdropPress={() => setShowTestTypeModal(false)}
           style={styles.bottomModal}
-          backdropTransitionOutTiming={0}>
+          backdropTransitionOutTiming={0}
+        >
           <View style={styles.modalContent}>
             <TouchableOpacity
               style={styles.closeIconContainer}
-              onPress={() => setShowTestTypeModal(false)}>
+              onPress={() => setShowTestTypeModal(false)}
+            >
               <Icon name="close" size={24} color="#555" />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Select Test Type</Text>
             <FlatList
               data={testTypes}
-              keyExtractor={item => item}
-              renderItem={({item}) =>
+              keyExtractor={(item) => item}
+              renderItem={({ item }) =>
                 renderOptionItem({
                   item,
                   selectedItem: selectedTestType,
@@ -342,26 +525,103 @@ const ScheduleScreen = () => {
           </View>
         </Modal>
 
+        {/* Second Row: Class, Subject, and Chapter */}
+        <View style={styles.row}>
+          {/* Class Selector */}
+          <View style={[styles.pickerContainer, { flex: 0.35 }]}>
+            <LinearGradient
+              colors={['#43a047', '#2e7d32']}
+              style={styles.gradient}
+            >
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setShowClassModal(true)}
+              >
+                <Icon
+                  name="school"
+                  size={20}
+                  color="#fff"
+                  style={styles.icon}
+                />
+                <Text style={styles.buttonText}>
+                  {selectedClasses.length > 0
+                    ? `${selectedClasses.length} Class`
+                    : 'Class'}
+                </Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
+
+          {/* Subject Selector */}
+          <View style={[styles.pickerContainer, { flex: 0.43 }]}>
+            <LinearGradient
+              colors={['#e53935', '#c62828']}
+              style={styles.gradient}
+            >
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setShowSubjectModal(true)}
+              >
+                <Icon name="book" size={20} color="#fff" style={styles.icon} />
+                <Text style={styles.buttonText}>
+                  {selectedSubjects.length > 0
+                    ? `${selectedSubjects.length} Subjects`
+                    : 'Subjects'}
+                </Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
+
+          {/* Chapter Selector */}
+          <View style={[styles.pickerContainer, { flex: 0.43 }]}>
+            <LinearGradient
+              colors={['#7b1fa2', '#6a1b9a']}
+              style={styles.gradient}
+            >
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setShowChapterModal(true)}
+              >
+                <Icon
+                  name="menu-book"
+                  size={20}
+                  color="#fff"
+                  style={styles.icon}
+                />
+                <Text style={styles.buttonText}>
+                  {selectedChapters.length > 0
+                    ? `${selectedChapters.length} Chapters`
+                    : 'Chapters'}
+                </Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
+        </View>
+
         {/* Class Modal */}
         <Modal
           isVisible={showClassModal}
           onBackdropPress={() => setShowClassModal(false)}
           style={styles.bottomModal}
-          backdropTransitionOutTiming={0}>
+          backdropTransitionOutTiming={0}
+        >
           <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.closeIconContainer}
-              onPress={() => setShowClassModal(false)}>
-              <Icon name="close" size={24} color="#555" />
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Select Class</Text>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Class</Text>
+              <TouchableOpacity
+                style={styles.closeIconContainer}
+                onPress={() => setShowClassModal(false)}
+              >
+                <Icon name="close" size={24} color="#555" />
+              </TouchableOpacity>
+            </View>
             <FlatList
               data={classOptions}
-              keyExtractor={item => item}
-              renderItem={({item}) =>
-                renderOptionItem({
+              keyExtractor={(item) => item}
+              renderItem={({ item }) =>
+                renderClassCheckbox({
                   item,
-                  selectedItem: selectedClass,
+                  selectedItems: selectedClasses,
                   onSelect: handleClassSelect,
                 })
               }
@@ -374,21 +634,25 @@ const ScheduleScreen = () => {
           isVisible={showSubjectModal}
           onBackdropPress={() => setShowSubjectModal(false)}
           style={styles.bottomModal}
-          backdropTransitionOutTiming={0}>
+          backdropTransitionOutTiming={0}
+        >
           <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.closeIconContainer}
-              onPress={() => setShowSubjectModal(false)}>
-              <Icon name="close" size={24} color="#555" />
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Select Subject</Text>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Subjects</Text>
+              <TouchableOpacity
+                style={styles.closeIconContainer}
+                onPress={() => setShowSubjectModal(false)}
+              >
+                <Icon name="close" size={24} color="#555" />
+              </TouchableOpacity>
+            </View>
             <FlatList
-              data={subjects[selectedClass] || []}
-              keyExtractor={item => item}
-              renderItem={({item}) =>
-                renderOptionItem({
+              data={getAvailableSubjects()}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) =>
+                renderClassCheckbox({
                   item,
-                  selectedItem: selectedSubject,
+                  selectedItems: selectedSubjects,
                   onSelect: handleSubjectSelect,
                 })
               }
@@ -401,36 +665,40 @@ const ScheduleScreen = () => {
           isVisible={showChapterModal}
           onBackdropPress={() => setShowChapterModal(false)}
           style={styles.bottomModal}
-          backdropTransitionOutTiming={0}>
+          backdropTransitionOutTiming={0}
+        >
           <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.closeIconContainer}
-              onPress={() => setShowChapterModal(false)}>
-              <Icon name="close" size={24} color="#555" />
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Select Chapter</Text>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Chapters</Text>
+              <TouchableOpacity
+                style={styles.closeIconContainer}
+                onPress={() => setShowChapterModal(false)}
+              >
+                <Icon name="close" size={24} color="#555" />
+              </TouchableOpacity>
+            </View>
             <FlatList
-              data={chapters[selectedSubject] || []}
-              keyExtractor={item => item}
-              renderItem={({item}) =>
-                renderOptionItem({
+              data={getAvailableChapters()}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) =>
+                renderChapterItem({
                   item,
-                  selectedItem: selectedChapter,
+                  selectedItems: selectedChapters,
                   onSelect: handleChapterSelect,
-                  textStyle: {fontSize: 14},
                 })
               }
             />
           </View>
         </Modal>
+
         {/* Schedule Table View */}
         <View style={styles.scheduleContainer}>
           <LinearGradient
             colors={['#4a90e2', '#357abd']}
-            style={styles.scheduleHeader}>
+            style={styles.scheduleHeader}
+          >
             <Text style={styles.scheduleHeaderText}>Schedule Table</Text>
           </LinearGradient>
-
           <View style={styles.scheduleContent}>
             {selectedDate && (
               <View style={styles.scheduleRow}>
@@ -446,35 +714,57 @@ const ScheduleScreen = () => {
               </View>
             )}
 
-            {selectedClass && (
+            {selectedClasses.length > 0 && (
               <View style={styles.scheduleRow}>
                 <Text style={styles.scheduleLabel}>Class:</Text>
-                <Text style={styles.scheduleValue}>{selectedClass}</Text>
+                <Text style={styles.scheduleValue}>
+                  {selectedClasses.join(', ')}
+                </Text>
               </View>
             )}
 
-            {selectedSubject && (
+            {selectedSubjects.length > 0 && (
               <View style={styles.scheduleRow}>
-                <Text style={styles.scheduleLabel}>Subject:</Text>
-                <Text style={styles.scheduleValue}>{selectedSubject}</Text>
+                <Text style={styles.scheduleLabel}>Subjects:</Text>
+                <Text style={styles.scheduleValue}>
+                  {selectedSubjects.join(', ')}
+                </Text>
               </View>
             )}
 
-            {selectedChapter && (
-              <View style={styles.scheduleRow}>
-                <Text style={styles.scheduleLabel}>Chapter:</Text>
-                <Text style={styles.scheduleValue}>{selectedChapter}</Text>
-              </View>
+            {selectedChapters.length > 0 && (
+              <>
+                <View style={styles.scheduleRow}>
+                  <Text style={styles.scheduleLabel}>Chapters:</Text>
+                  <Text style={styles.scheduleValue}>
+                    {selectedChapters.join(', ')}
+                  </Text>
+                </View>
+                {Object.entries(selectedTopics).map(([chapter, topics]) =>
+                  topics.length > 0 ? (
+                    <View key={chapter} style={styles.scheduleRow}>
+                      <Text style={[styles.scheduleLabel, { fontSize: 13 }]}>
+                        {chapter} Topics:
+                      </Text>
+                      <Text style={[styles.scheduleValue, { fontSize: 13 }]}>
+                        {topics.join(', ')}
+                      </Text>
+                    </View>
+                  ) : null
+                )}
+              </>
             )}
           </View>
         </View>
         {/* Schedule Button */}
         <TouchableOpacity
           style={styles.scheduleButton}
-          onPress={handleSchedulePress}>
+          onPress={handleSchedulePress}
+        >
           <LinearGradient
             colors={['#4CAF50', '#45a049']}
-            style={styles.buttonGradient}>
+            style={styles.buttonGradient}
+          >
             <Text style={styles.buttonText}>Schedule Test</Text>
           </LinearGradient>
         </TouchableOpacity>
@@ -496,7 +786,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   pickerContainer: {
-    width: 50,
+    // width:50,
     flex: 1,
     marginHorizontal: 4,
   },
@@ -504,7 +794,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 3,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
@@ -520,7 +810,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#FFFFFF',
-    // right:4,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -534,7 +823,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: -2},
+    shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.25,
     shadowRadius: 5,
     elevation: 5,
@@ -550,7 +839,7 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   modalTitle: {
-    fontSize: 14,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 20,
@@ -565,7 +854,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
   },
@@ -583,7 +872,7 @@ const styles = StyleSheet.create({
     color: '#1976d2',
   },
   subjectPickerContainer: {
-    flex: 1,
+    flex: 1.5,
     marginHorizontal: 4,
   },
   scheduleContainer: {
@@ -650,18 +939,71 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  heading: {
-    fontSize: 20,
-    marginBottom: 8,
-    color: '#101828',
-    textAlign: 'center',
-    fontWeight: '600',
-    textShadowColor: 'orange',
-    textShadowOffset: {width: 0.3, height: 0.3},
-    textShadowRadius: 1,
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    left:10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  checkbox1: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: '#4a90e2',
+    borderRadius: 4,
+    marginRight: 10,
+    // right:25,
+    // top:23,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: '#4a90e2',
+    borderRadius: 4,
+    marginRight: 10,
+    right:25,
+    top:23,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  topiccheckbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: '#4a90e2',
+    borderRadius: 4,
+    marginRight: 10,
+    // right:25,
+    // top:23,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  topicsContainer: {
+    marginLeft: 32,
+    marginTop: 4,
+    marginBottom: 4,
+    borderLeftWidth: 1,
+    borderLeftColor: '#e0e0e0',
+  },
+  topicCheckboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  topicText: {
+    fontSize: 14,
+    color: '#666',
+    marginLeft: 8,
+  },
+  expandIcon: {
+    marginLeft: 'auto',
   },
 });
 
-export default ScheduleScreen;
-
-// const styles = StyleSheet.create({})
+export default TestScheduleScreen;

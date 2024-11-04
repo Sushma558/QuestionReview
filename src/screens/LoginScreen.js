@@ -16,6 +16,7 @@ import VisibilityOff from '../assets/VisibilityOff';
 import SamAi from '../assets/SamAi.png';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { useUserData } from '../../UserContext';
 // Test credentials
 const TEST_EMAIL = 'test@example.com';
 const TEST_PASSWORD = 'password123';
@@ -26,7 +27,7 @@ const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState();
   const navigation=useNavigation();
-
+  const {user, changeUser} = useUserData();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -42,6 +43,7 @@ const LoginScreen = () => {
         // getUserDetails(res.user.uid);
         console.log(res.data());
         navigation.navigate("Home", { userdata: res.data()} );
+        changeUser(res.data());
         console.log("Home", { userdata: res.data() });
 
       })

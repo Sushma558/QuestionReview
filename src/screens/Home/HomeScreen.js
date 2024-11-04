@@ -10,6 +10,7 @@ import {
 import React, {useState, useEffect} from 'react';
 import {useNavigation,} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
+import { useUserData } from '../../../UserContext';
 
 const admincard = [
   {name: 'ADD USER', bgColor: 'rgba(53, 186, 246,0.7)', navigate: 'adduser'},
@@ -48,9 +49,10 @@ const HomeScreen = ({route}) => {
   const [reviewCode, setreviewCode] = useState();
   const [reviewapproved, setreviewapproved] = useState([]);
   const [reviewrejected, setreviewrejected] = useState([]);
+  const {user, changeUser} = useUserData();
   useEffect(() => {
-    if (userdata) {
-      if (JSON.parse(userToken)?.userType == 'Admin') {
+    if (user) {
+      if (user?.userType == 'Admin') {
         firestore().collection('SAMAISections')
           .orderBy('addedOn', 'desc')
           .onSnapshot(snapShot => {
@@ -62,8 +64,8 @@ const HomeScreen = ({route}) => {
           });
       } else {
         firestore().collection('SAMAISections')
-          .where('userType', '==', JSON.parse(userToken)?.userType)
-          .where('subject', '==', JSON.parse(userToken)?.subject)
+          .where('userType', '==', user?.userType)
+          .where('subject', '==', user?.subject)
           .orderBy('addedOn', 'desc')
           .onSnapshot(snapShot => {
             var cards = [];
@@ -75,7 +77,7 @@ const HomeScreen = ({route}) => {
       }
       try {
         firestore().collection('SamaiReviewUsers')
-          .doc(JSON.parse(userToken)?.userId)
+          .doc(user?.userId)
           .onSnapshot(snap => {
             setcountdata(snap.data());
           });
@@ -122,7 +124,7 @@ const HomeScreen = ({route}) => {
         console.log(error);
       }
     }
-  }, [userdata]);
+  }, [user]);
 
   // Card click handler for navigation
   const handleCardPress = cardName => {
@@ -132,19 +134,19 @@ const HomeScreen = ({route}) => {
   const cards = [
     {
       name: 'TOTAL COUNT',
-      count: 1000,
+      count: user?.reviewCount,
       bgColor: 'rgba(242,139,130,0.7)',
       navigate: 'reviewedqns',
     },
     {
       name: 'APPROVED COUNT',
-      count: 1000,
+      count: user?.approveCount,
       bgColor: 'rgba(251, 188, 4,0.7)',
       navigate: 'reviewedqns',
     },
     {
       name: 'REJECTED COUNT',
-      count: countdata?.rejectCount,
+      count: user?.rejectCount,
       bgColor: 'rgba(52, 168, 83,0.7)',
       navigate: 'reviewedqns',
     },
@@ -190,7 +192,7 @@ const HomeScreen = ({route}) => {
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}>
       <View>
-        <Text style={styles.heading}> Hey- {JSON.stringify(userdata ? userdata?.name  : "User")} 👋</Text>
+        <Text style={styles.heading}> Hey- {user?user?.name:"User"} 👋</Text>
         <Text style={styles.data}>
           Here You can see all the information about reviewed data
         </Text>
