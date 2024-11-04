@@ -47,7 +47,7 @@ const LoginScreen = ({navigation}) => {
         console.log('User signed in successfully');
         console.log('User data:', JSON.stringify(userCredential.user, null, 2));
         setLoading(false);
-        navigation.navigate('Home');
+        navigation.navigate('TestScheduleScreen');
       }
     } catch (error) {
       console.error('Login error:', error);

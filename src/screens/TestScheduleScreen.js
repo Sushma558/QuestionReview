@@ -6,13 +6,14 @@ import {
   FlatList,
   ScrollView,
   Alert,
-} from "react-native";
+} from 'react-native';
 import React, { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Modal from "react-native-modal";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation } from '@react-navigation/native';
+// import axios from "axios";
 
 const TestScheduleScreen = () => {
 
@@ -143,6 +144,19 @@ const navigation = useNavigation();
     ],
   }; 
 
+  const fetchSubjects = (classData) => {
+    axios
+      .get("https://mep.scontiapp.com/samai/v1/api/v1/entity/all", {
+        params: {
+          exam_id: "2df8f075-e95a-4126-a80d-7a68b7e4c31e",
+          parent_id: "2df8f075-e95a-4126-a80d-7a68b7e4c31e",
+          type: "subject",
+          // subject_class: classData,
+        },
+      })
+      .then((response) => setSubjectsData(response.data.entities));
+  };
+
   // Handlers
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -266,6 +280,27 @@ const navigation = useNavigation();
     </TouchableOpacity>
   );
 
+  const renderClassCheckbox = ({ item, selectedItems, onSelect }) => (
+    <TouchableOpacity
+      style={styles.checkboxContainer}
+      onPress={() => onSelect(item)}
+    >
+      <View style={styles.checkbox1}>
+        {selectedItems.includes(item) && (
+          <Icon name="check" size={16} color="#4a90e2" />
+        )}
+      </View>
+      <Text style={styles.optionText}>{item}</Text>
+    </TouchableOpacity>
+  );
+
+  const handleSubjectChange = (event) => {
+    // setCollegeYear(event.target.value);
+    fetchSubjects(event.target.value);
+    validateForm();
+  };
+
+
   // Handle selection functions
   const handleClassSelect = (classItem) => {
     setSelectedClasses((prev) =>
@@ -388,7 +423,7 @@ const navigation = useNavigation();
                 style={styles.topicCheckboxContainer}
                 onPress={() => handleTopicSelect(item, topic)}
               >
-                <View style={styles.checkbox}>
+                <View style={styles.topiccheckbox}>
                   {selectedTopics[item]?.includes(topic) && (
                     <Icon name="check" size={14} color="#4a90e2" />
                   )}
@@ -510,7 +545,7 @@ const navigation = useNavigation();
                 />
                 <Text style={styles.buttonText}>
                   {selectedClasses.length > 0
-                    ? `${selectedClasses.length} Class`
+                    ?` ${selectedClasses.length} Class`
                     : "Class"}
                 </Text>
               </TouchableOpacity>
@@ -584,7 +619,7 @@ const navigation = useNavigation();
               data={classOptions}
               keyExtractor={(item) => item}
               renderItem={({ item }) =>
-                renderCheckboxItem({
+                renderClassCheckbox({
                   item,
                   selectedItems: selectedClasses,
                   onSelect: handleClassSelect,
@@ -615,7 +650,7 @@ const navigation = useNavigation();
               data={getAvailableSubjects()}
               keyExtractor={(item) => item}
               renderItem={({ item }) =>
-                renderCheckboxItem({
+                renderClassCheckbox({
                   item,
                   selectedItems: selectedSubjects,
                   onSelect: handleSubjectSelect,
@@ -908,8 +943,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
+    left:10,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
+  },
+  checkbox1: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: "#4a90e2",
+    borderRadius: 4,
+    marginRight: 10,
+    // right:25,
+    // top:23,
+    justifyContent: "center",
+    alignItems: "center",
   },
   checkbox: {
     width: 20,
@@ -917,7 +965,21 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#4a90e2",
     borderRadius: 4,
-    marginRight: 12,
+    marginRight: 10,
+    right:25,
+    top:23,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  topiccheckbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: "#4a90e2",
+    borderRadius: 4,
+    marginRight: 10,
+    // right:25,
+    // top:23,
     justifyContent: "center",
     alignItems: "center",
   },
