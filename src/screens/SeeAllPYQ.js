@@ -30,7 +30,7 @@ function SeeAllPYQ({navigation}) {
   }, [route?.params]);
 
   const fetchQuestions = (reviewers) => {
-    console.log(reviewers)
+    console.log(route?.params?.selected)
     let query = firestore()
       .collection('NEETReviewQNS')
       .where('reviewCode', '==', route?.params?.selected?.reviewCode)

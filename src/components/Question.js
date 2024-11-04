@@ -44,8 +44,9 @@ const Question = ({
 
   const handlePush = item => {
     // Add the pushed question to the state
-    setPushedQuestions(prevState => [...prevState, item.id]);
-    handleSingleQUestionPush();
+    // setPushedQuestions(prevState => [...prevState, item.id]);
+    // handleSingleQUestionPush();
+    console.log(item)
   };
   const handleSingleQUestionPush = () => {
     const data = {

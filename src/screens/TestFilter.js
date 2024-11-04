@@ -158,7 +158,7 @@ function TestScreen() {
             style={styles.picker}
             onValueChange={itemValue => handleYearChange(itemValue)}>
             {filteredSections.map((item, index) => {
-              return <Picker.Item label={item?.name} value={item} />;
+              return <Picker.Item key={item?.reviewCode} label={item?.name} value={item} />;
             })}
           </Picker>
         </View>
